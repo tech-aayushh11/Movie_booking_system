@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Review and confirm your CineBook movie ticket booking.">
+  <title>Checkout — CineBook</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="page" id="checkout-page">
+
+  <!-- ── Sub-page Bar ───────────────────────────── -->
+  <nav class="subpage-bar">
+    <button class="icon-btn" onclick="App.goBack()" aria-label="Go back to seat selection">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 12H5M12 5l-7 7 7 7"/>
+      </svg>
+    </button>
+    <div class="subpage-bar-center">
+      <div class="subpage-title">Booking Details</div>
+    </div>
+  </nav>
+
+  <!-- ── Checkout Body ─────────────────────────── -->
+  <main class="checkout-body" id="checkout-body">
+
+    <!-- Availability error -->
+    <div id="availability-error" class="hidden"
+      style="background:var(--red-dim);border:1px solid rgba(255,59,48,0.3);border-radius:var(--radius-md);padding:12px;margin-bottom:16px;font-size:13px;color:var(--red);display:flex;gap:8px;align-items:flex-start;">
+      <span>⚠</span>
+      <div>
+        <strong>Seat Availability Changed</strong><br>
+        <span id="availability-error-msg">Some of your selected seats are no longer available.</span>
+        <br><button onclick="App.goBack()" style="color:var(--accent);font-weight:600;font-size:12px;background:none;border:none;cursor:pointer;margin-top:4px;">← Re-select seats</button>
+      </div>
+    </div>
+
+    <!-- Movie card -->
+    <div class="checkout-movie-card">
+      <div class="checkout-poster">
+        <img src="poster.jpg" alt="Udta Teer" style="width:100%;height:100%;object-fit:cover;"
+          onerror="this.parentElement.innerHTML='🎬'">
+      </div>
+      <div class="checkout-movie-info">
+        <div class="checkout-movie-title">Udta Teer</div>
+        <div class="checkout-movie-meta">UA13+ · Hindi · 2h 18m</div>
+        <div style="margin-top:4px;font-size:11px;color:var(--text-muted);">Released 23rd October</div>
+      </div>
+    </div>
+
+    <!-- Booking detail block -->
+    <div class="detail-block">
+      <div class="detail-row">
+        <span class="detail-key">Theatre</span>
+        <span class="detail-val" id="detail-theatre">—</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-key">Date</span>
+        <span class="detail-val" id="detail-date">—</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-key">Showtime</span>
+        <span class="detail-val" id="detail-show">—</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-key">Format</span>
+        <span class="detail-val" id="detail-format">Standard</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-key">Seats</span>
+        <span class="detail-val" id="detail-seats">—</span>
+      </div>
+    </div>
+
+    <!-- Seat price breakdown -->
+    <div class="detail-block" id="price-breakdown">
+      <!-- filled by JS -->
+    </div>
+
+    <!-- Contact form -->
+    <div class="detail-block" style="padding:14px;">
+      <div style="font-size:13px;font-weight:700;margin-bottom:14px;">Your Details</div>
+
+      <div class="form-group">
+        <label for="guest-name" class="form-label">Full Name *</label>
+        <input type="text" id="guest-name" class="form-input" placeholder="Enter your name" autocomplete="name">
+        <div class="form-error" id="name-error">Please enter your name.</div>
+      </div>
+
+      <div class="form-group">
+        <label for="guest-email" class="form-label">Email Address *</label>
+        <input type="email" id="guest-email" class="form-input" placeholder="you@email.com" autocomplete="email">
+        <div class="form-error" id="email-error">Please enter a valid email address.</div>
+      </div>
+
+      <div class="form-group">
+        <label for="guest-phone" class="form-label">Mobile Number *</label>
+        <input type="tel" id="guest-phone" class="form-input" placeholder="10-digit mobile number" autocomplete="tel" maxlength="10">
+        <div class="form-error" id="phone-error">Please enter a valid 10-digit mobile number.</div>
+      </div>
+    </div>
+
+    <!-- Notice -->
+    <div style="background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--radius-md);padding:12px 14px;margin-bottom:16px;display:flex;gap:10px;">
+      <span style="font-size:14px;flex-shrink:0;">🔒</span>
+      <p style="font-size:11px;color:var(--text-secondary);line-height:1.6;margin:0;">
+        This is a <strong style="color:var(--text-primary);">demonstration booking</strong>. No real payment or personal data is processed. Seats are reserved in this demo application only.
+      </p>
+    </div>
+  </main>
+
+  <!-- ── Sticky Confirm Bar ─────────────────────── -->
+  <div class="book-bar" style="display:flex;flex-direction:column;gap:10px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <div>
+        <div style="font-size:11px;color:var(--text-secondary);">Total Amount</div>
+        <div style="font-size:20px;font-weight:800;color:var(--accent);">₹<span id="total-display">0</span></div>
+      </div>
+      <button class="btn btn-outline" onclick="App.goBack()">← Back to Seats</button>
+    </div>
+    <button class="btn btn-primary btn-full btn-lg" id="confirm-btn" onclick="confirmBooking()">
+      Confirm Booking
+    </button>
+  </div>
+</div>
+
+<script src="data.js"></script>
+<script src="data-structures.js"></script>
+<script src="app.js"></script>
+<script>
+"use strict";
+
+let pageTheatre = null;
+let pageShow = null;
+let pageDate = "";
+let pageSeats = [];
+
+document.addEventListener("DOMContentLoaded", () => {
+  const theatreId = App.getParam("theatre") || App.Session.getTheatre();
+  const showId    = App.getParam("show")    || App.Session.getShow();
+  pageDate        = App.getParam("date")
+    ? decodeURIComponent(App.getParam("date"))
+    : (App.Session.getDate() || "23 Oct");
+  pageSeats       = App.Session.getSeats();
+
+  if (!theatreId || !showId || !pageSeats || pageSeats.length === 0) {
+    document.getElementById("checkout-body").innerHTML = `
+      <div class="empty-state">
+        <div class="empty-state-icon">⚠️</div>
+        <div class="empty-state-title">No Booking Data</div>
+        <div class="empty-state-desc">It looks like you navigated here directly. Please start from the home page.</div>
+        <button class="btn btn-primary" onclick="window.location.href='index.html'" style="margin-top:20px;">Go Home</button>
+      </div>`;
+    document.querySelector(".book-bar").style.display = "none";
+    return;
+  }
+
+  pageTheatre = CineData.getTheatreById(theatreId);
+  const showResult = CineData.getShowById(theatreId, showId);
+  pageShow = showResult ? showResult.show : null;
+
+  if (!pageTheatre || !pageShow) {
+    App.showToast("Could not load booking details.", "error");
+    return;
+  }
+
+  // Check seat availability
+  const seatIds = pageSeats.map(s => s.id);
+  if (!DSA.areSeatsAvailable(theatreId, showId, seatIds)) {
+    const errorEl = document.getElementById("availability-error");
+    errorEl.classList.remove("hidden");
+    document.getElementById("availability-error-msg").textContent =
+      "One or more of your selected seats have already been booked. Please go back and select different seats.";
+    document.getElementById("confirm-btn").disabled = true;
+    document.getElementById("confirm-btn").style.opacity = "0.4";
+  }
+
+  renderDetails();
+});
+
+function renderDetails() {
+  document.getElementById("detail-theatre").textContent = pageTheatre.fullName;
+  document.getElementById("detail-date").textContent    = pageDate;
+  document.getElementById("detail-show").textContent    = pageShow.time;
+  document.getElementById("detail-format").textContent  = pageShow.format || "Standard";
+  document.getElementById("detail-seats").textContent   = pageSeats.map(s => s.id).join(", ");
+
+  // Price breakdown
+  const breakdown = document.getElementById("price-breakdown");
+  const groups = {};
+  pageSeats.forEach(s => {
+    const key = `${s.category}|${s.price}`;
+    if (!groups[key]) groups[key] = { category: s.category, price: s.price, count: 0, seats: [] };
+    groups[key].count++;
+    groups[key].seats.push(s.id);
+  });
+
+  const total = pageSeats.reduce((sum, s) => sum + s.price, 0);
+
+  breakdown.innerHTML = `
+    <div style="font-size:13px;font-weight:700;margin-bottom:12px;">Price Breakdown</div>
+    ${Object.values(groups).map(g => {
+      const catInfo = CineData.SEAT_CATEGORIES[g.category] || { label: g.category };
+      return `
+        <div class="detail-row">
+          <div>
+            <div class="detail-key">${catInfo.label}</div>
+            <div style="font-size:10px;color:var(--text-muted);">${g.seats.join(", ")}</div>
+          </div>
+          <span class="detail-val">${g.count} × ₹${g.price} = ₹${(g.count * g.price).toLocaleString("en-IN")}</span>
+        </div>
+      `;
+    }).join("")}
+    <div class="total-row">
+      <span class="total-label">Total</span>
+      <span class="total-amount">₹${total.toLocaleString("en-IN")}</span>
+    </div>
+  `;
+
+  document.getElementById("total-display").textContent = total.toLocaleString("en-IN");
+  document.title = `Checkout ₹${total} — CineBook`;
+}
+
+// ── Validation ────────────────────────────────────────
+function validateForm() {
+  let valid = true;
+  const name  = document.getElementById("guest-name").value.trim();
+  const email = document.getElementById("guest-email").value.trim();
+  const phone = document.getElementById("guest-phone").value.trim();
+
+  const nameErr  = document.getElementById("name-error");
+  const emailErr = document.getElementById("email-error");
+  const phoneErr = document.getElementById("phone-error");
+
+  if (!name || name.length < 2) {
+    nameErr.classList.add("visible"); valid = false;
+  } else {
+    nameErr.classList.remove("visible");
+  }
+
+  const emailRx = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!email || !emailRx.test(email)) {
+    emailErr.classList.add("visible"); valid = false;
+  } else {
+    emailErr.classList.remove("visible");
+  }
+
+  const phoneRx = /^\d{10}$/;
+  if (!phone || !phoneRx.test(phone)) {
+    phoneErr.classList.add("visible"); valid = false;
+  } else {
+    phoneErr.classList.remove("visible");
+  }
+
+  return valid;
+}
+
+// ── Confirm Booking ───────────────────────────────────
+function confirmBooking() {
+  if (!validateForm()) {
+    App.showToast("Please fill in all required fields correctly.", "error");
+    return;
+  }
+
+  const seatIds = pageSeats.map(s => s.id);
+
+  // Final availability check
+  if (!DSA.areSeatsAvailable(pageTheatre.id, pageShow.id, seatIds)) {
+    document.getElementById("availability-error").classList.remove("hidden");
+    document.getElementById("availability-error-msg").textContent =
+      "Some seats are no longer available. Please go back and re-select.";
+    App.showToast("Seat availability conflict. Please re-select seats.", "error");
+    return;
+  }
+
+  // Occupy seats in LocalStorage
+  DSA.occupySeats(pageTheatre.id, pageShow.id, seatIds);
+
+  // Build booking record
+  const total = pageSeats.reduce((sum, s) => sum + s.price, 0);
+  const bookingData = {
+    movieId:     "udta-teer",
+    movieTitle:  "Udta Teer",
+    theatreId:   pageTheatre.id,
+    theatreName: pageTheatre.fullName,
+    date:        pageDate,
+    showId:      pageShow.id,
+    showTime:    pageShow.time,
+    showFormat:  pageShow.format || "Standard",
+    seats:       pageSeats.map(s => ({ id: s.id, category: s.category, price: s.price })),
+    total:       total,
+    guestName:   document.getElementById("guest-name").value.trim(),
+    guestEmail:  document.getElementById("guest-email").value.trim(),
+    guestPhone:  document.getElementById("guest-phone").value.trim()
+  };
+
+  // Add to linked list (DSA) and persist
+  const booking = DSA.addBooking(bookingData);
+  App.Session.setLastBooking(booking);
+  App.Session.clearSeats();
+
+  // Navigate to confirmation
+  window.location.href = `confirmation.html?id=${booking.id}`;
+}
+
+// Live validation
+["guest-name","guest-email","guest-phone"].forEach(id => {
+  document.getElementById(id)?.addEventListener("input", () => {
+    const errId = id.replace("guest-","") + "-error";
+    document.getElementById(errId)?.classList.remove("visible");
+  });
+});
+</script>
+</body>
+</html>

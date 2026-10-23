@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="FDS DSA Lab — Fundamentals of Data Structures demonstrations for JSPM's Rajarshi Shahu College of Engineering, Pune.">
+  <title>FDS DSA Lab — CineBook</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .ll-head-label {
+      font-size: 9px;
+      font-weight: 700;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      text-align: center;
+      margin-bottom: 2px;
+    }
+    .search-highlight {
+      background: var(--accent-dim);
+      border: 1.5px solid var(--accent) !important;
+      color: var(--accent) !important;
+    }
+    .search-scan {
+      background: rgba(245,166,35,0.15);
+      border: 1.5px solid var(--gold) !important;
+    }
+    .sort-step-log {
+      font-size: 10px;
+      color: var(--text-muted);
+      line-height: 1.8;
+      font-family: monospace;
+      max-height: 150px;
+      overflow-y: auto;
+      scrollbar-width: thin;
+    }
+
+    /* Animated bars */
+    @keyframes bar-pop {
+      0%   { transform: scaleY(0); }
+      60%  { transform: scaleY(1.05); }
+      100% { transform: scaleY(1); }
+    }
+    .sort-bar { animation: bar-pop 0.3s ease both; transform-origin: bottom; }
+
+    .code-block {
+      background: var(--bg-main);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      font-size: 11px;
+      font-family: 'Courier New', monospace;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      white-space: pre;
+      overflow-x: auto;
+      margin: 10px 0;
+    }
+    .code-keyword { color: #c792ea; }
+    .code-fn      { color: #82aaff; }
+    .code-str     { color: #c3e88d; }
+    .code-num     { color: #f78c6c; }
+    .code-comment { color: #546e7a; font-style: italic; }
+  </style>
+</head>
+<body>
+<div class="page" id="dsa-page">
+
+  <!-- ── Sub-page Bar ───────────────────────────── -->
+  <nav class="subpage-bar">
+    <button class="icon-btn" onclick="window.location.href='index.html'" aria-label="Go home">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 12H5M12 5l-7 7 7 7"/>
+      </svg>
+    </button>
+    <div class="subpage-bar-center">
+      <div class="subpage-title">FDS DSA Lab</div>
+      <div class="subpage-meta">JSPM's Rajarshi Shahu College of Engineering, Pune</div>
+    </div>
+  </nav>
+
+  <div class="dsa-body">
+
+    <!-- ── Header ─────────────────────────────────── -->
+    <div class="dsa-header-section">
+      <div class="dsa-header-title">🧪 Data Structures Lab</div>
+      <div class="dsa-header-sub">
+        Fundamentals of Data Structures (FDS)<br>
+        JSPM's Rajarshi Shahu College of Engineering, Pune<br>
+        <span style="color:var(--accent);font-weight:600;">CineBook Mini Project — Live Algorithm Demonstrations</span>
+      </div>
+    </div>
+
+    <!-- ── Algorithm Tabs ─────────────────────────── -->
+    <div class="algo-tabs" role="tablist">
+      <button class="algo-tab-btn active" onclick="showPanel('arrays', this)" id="tab-arrays">📦 Arrays</button>
+      <button class="algo-tab-btn" onclick="showPanel('linked-list', this)" id="tab-linked-list">🔗 Linked List</button>
+      <button class="algo-tab-btn" onclick="showPanel('linear-search', this)" id="tab-linear-search">🔍 Linear Search</button>
+      <button class="algo-tab-btn" onclick="showPanel('binary-search', this)" id="tab-binary-search">⚡ Binary Search</button>
+      <button class="algo-tab-btn" onclick="showPanel('bubble-sort', this)" id="tab-bubble-sort">🫧 Bubble Sort</button>
+      <button class="algo-tab-btn" onclick="showPanel('selection-sort', this)" id="tab-selection-sort">🔢 Selection Sort</button>
+      <button class="algo-tab-btn" onclick="showPanel('complexity', this)" id="tab-complexity">📊 Complexity</button>
+    </div>
+
+    <!-- ══════════════════════════════════════════ -->
+    <!-- PANEL: Arrays                              -->
+    <!-- ══════════════════════════════════════════ -->
+    <div id="panel-arrays" class="dsa-panel">
+      <div class="dsa-panel-title">📦 Arrays — The Foundation</div>
+      <div class="dsa-panel-desc">
+        An <strong>array</strong> is a contiguous block of memory holding elements of the same type.
+        In CineBook, arrays store the list of movies, theatres, showtimes, and seat rows.
+        Arrays support O(1) random access by index — the most fundamental data structure.
+      </div>
+
+      <div class="code-block"><span class="code-comment">// CineBook uses arrays extensively:</span>
+<span class="code-keyword">const</span> <span class="code-fn">MOVIES</span>   = [movie1, movie2, movie3];    <span class="code-comment">// movie catalogue</span>
+<span class="code-keyword">const</span> <span class="code-fn">THEATRES</span> = [theatre1, ... theatre5];  <span class="code-comment">// all 5 theatres</span>
+<span class="code-keyword">const</span> <span class="code-fn">seatRow</span>  = [seat1, seat2, ... seatN]; <span class="code-comment">// per-row seats</span>
+
+<span class="code-comment">// O(1) — constant time access by index:</span>
+<span class="code-keyword">const</span> movie  = MOVIES[<span class="code-num">0</span>];     <span class="code-comment">// Udta Teer</span>
+<span class="code-keyword">const</span> seat   = seatRow[<span class="code-num">4</span>];   <span class="code-comment">// seat at index 4</span></div>
+
+      <div style="margin-bottom:12px;font-size:12px;font-weight:600;">Movie Array (current dataset)</div>
+      <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;font-size:11px;">
+          <thead>
+            <tr style="background:var(--bg-surface);">
+              <th style="padding:8px;text-align:left;color:var(--text-secondary);border-bottom:1px solid var(--border);">Index</th>
+              <th style="padding:8px;text-align:left;color:var(--text-secondary);border-bottom:1px solid var(--border);">Title</th>
+              <th style="padding:8px;text-align:left;color:var(--text-secondary);border-bottom:1px solid var(--border);">Language</th>
+              <th style="padding:8px;text-align:left;color:var(--text-secondary);border-bottom:1px solid var(--border);">Rating</th>
+            </tr>
+          </thead>
+          <tbody id="arrays-table-body">
+          </tbody>
+        </table>
+      </div>
+
+      <div style="margin-top:14px;">
+        <div style="font-size:12px;font-weight:600;margin-bottom:8px;">Access Element by Index</div>
+        <div class="dsa-controls">
+          <input type="number" id="array-index-input" class="dsa-input" placeholder="Enter index (0, 1, 2…)" min="0">
+          <button class="dsa-btn" onclick="accessByIndex()">Access</button>
+        </div>
+        <div class="dsa-result" id="array-result">Enter an index to access that movie element in O(1) time.</div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════ -->
+    <!-- PANEL: Linked List                         -->
+    <!-- ══════════════════════════════════════════ -->
+    <div id="panel-linked-list" class="dsa-panel hidden">
+      <div class="dsa-panel-title">🔗 Singly Linked List — Booking History</div>
+      <div class="dsa-panel-desc">
+        A <strong>singly linked list</strong> is a chain of nodes where each node holds data and a pointer (reference) to the next node.
+        CineBook uses a custom <code style="color:var(--accent);">BookingLinkedList</code> to store booking history.
+        Unlike arrays, linked lists support O(1) insertion at the head without shifting elements.
+      </div>
+
+      <div class="code-block"><span class="code-keyword">class</span> <span class="code-fn">BookingNode</span> {
+  <span class="code-fn">constructor</span>(data) {
+    <span class="code-keyword">this</span>.data = data;   <span class="code-comment">// booking record</span>
+    <span class="code-keyword">this</span>.next = <span class="code-keyword">null</span>;   <span class="code-comment">// pointer to next node</span>
+  }
+}
+
+<span class="code-comment">// Memory: [data|→] → [data|→] → [data|→] → null</span>
+<span class="code-comment">// insertAtHead: O(1)  |  search: O(n)  |  traverse: O(n)</span></div>
+
+      <div style="font-size:12px;font-weight:600;margin-bottom:8px;">Current Booking List (head → tail)</div>
+      <div class="ll-nodes" id="ll-visualizer">
+        <div style="font-size:12px;color:var(--text-muted);">No bookings yet — make a booking to see the linked list!</div>
+      </div>
+
+      <div class="dsa-controls" style="margin-top:14px;">
+        <button class="dsa-btn" onclick="insertDemoNode()">Insert Demo Node</button>
+        <button class="dsa-btn dsa-btn-outline" onclick="traverseList()">Traverse List</button>
+        <input type="text" id="ll-search-input" class="dsa-input" placeholder="Search booking ID…">
+        <button class="dsa-btn" onclick="searchInList()">Search</button>
+      </div>
+      <div class="dsa-result" id="ll-result">Use the controls above to interact with the linked list.</div>
+
+      <div style="margin-top:12px;">
+        <div class="steps-counter">
+          <div class="step-stat">Nodes: <strong id="ll-size">0</strong></div>
+          <div class="step-stat">Last traversal steps: <strong id="ll-steps">—</strong></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════ -->
+    <!-- PANEL: Linear Search                       -->
+    <!-- ══════════════════════════════════════════ -->
+    <div id="panel-linear-search" class="dsa-panel hidden">
+      <div class="dsa-panel-title">🔍 Linear Search — O(n)</div>
+      <div class="dsa-panel-desc">
+        <strong>Linear Search</strong> checks every element one by one from index 0.
+        Best case: O(1) if found at first position. Worst case: O(n) if at last or absent.
+        CineBook uses this for the movie search bar on the home page.
+      </div>
+
+      <div class="code-block"><span class="code-keyword">function</span> <span class="code-fn">linearSearch</span>(arr, query) {
+  <span class="code-keyword">for</span> (<span class="code-keyword">let</span> i = <span class="code-num">0</span>; i &lt; arr.length; i++) {
+    <span class="code-keyword">if</span> (arr[i].title.includes(query)) {
+      <span class="code-keyword">return</span> { index: i, steps: i + <span class="code-num">1</span> }; <span class="code-comment">// found</span>
+    }
+  }
+  <span class="code-keyword">return</span> { index: -<span class="code-num">1</span>, found: <span class="code-keyword">false</span> };    <span class="code-comment">// not found</span>
+}</div>
+
+      <div class="dsa-controls">
+        <input type="text" id="linear-search-input" class="dsa-input" placeholder="Search movie title…" value="Udta">
+        <button class="dsa-btn" onclick="runLinearSearch()">Search</button>
+      </div>
+
+      <!-- Movie cards for visualization -->
+      <div id="linear-search-vis" style="display:flex;flex-direction:column;gap:6px;margin:12px 0;"></div>
+
+      <div class="dsa-result" id="linear-result">Enter a search term and click Search.</div>
+
+      <div class="steps-counter" style="margin-top:8px;">
+        <div class="step-stat">Steps taken: <strong id="linear-steps">—</strong></div>
+        <div class="step-stat">Array size n: <strong id="linear-n">3</strong></div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════ -->
+    <!-- PANEL: Binary Search                       -->
+    <!-- ══════════════════════════════════════════ -->
+    <div id="panel-binary-search" class="dsa-panel hidden">
+      <div class="dsa-panel-title">⚡ Binary Search — O(log n)</div>
+      <div class="dsa-panel-desc">
+        <strong>Binary Search</strong> requires a <em>sorted</em> array. It repeatedly halves the search space by comparing the middle element.
+        With n=100, binary search needs at most 7 comparisons vs. 100 for linear search.
+        CineBook uses this to find a movie by numeric rating score on a sorted array.
+      </div>
+
+      <div class="code-block"><span class="code-comment">// PRECONDITION: arr must be sorted ascending by key</span>
+<span class="code-keyword">function</span> <span class="code-fn">binarySearch</span>(arr, target, key) {
+  <span class="code-keyword">let</span> lo = <span class="code-num">0</span>, hi = arr.length - <span class="code-num">1</span>;
+  <span class="code-keyword">while</span> (lo &lt;= hi) {
+    <span class="code-keyword">const</span> mid = Math.floor((lo + hi) / <span class="code-num">2</span>);
+    <span class="code-keyword">if</span>      (arr[mid][key] === target) <span class="code-keyword">return</span> mid; <span class="code-comment">// found</span>
+    <span class="code-keyword">else if</span> (arr[mid][key] &lt;  target) lo = mid + <span class="code-num">1</span>; <span class="code-comment">// right half</span>
+    <span class="code-keyword">else</span>                               hi = mid - <span class="code-num">1</span>; <span class="code-comment">// left half</span>
+  }
+  <span class="code-keyword">return</span> -<span class="code-num">1</span>; <span class="code-comment">// not found</span>
+}</div>
+
+      <div style="font-size:12px;font-weight:600;margin-bottom:8px;">Sorted Movie Array (by rating)</div>
+      <div id="binary-sorted-vis" style="display:flex;gap:6px;overflow-x:auto;margin-bottom:12px;padding:4px;"></div>
+
+      <div class="dsa-controls">
+        <input type="number" id="binary-search-input" class="dsa-input" placeholder="Target rating (e.g. 7.8)" step="0.1" min="0" max="10">
+        <button class="dsa-btn" onclick="runBinarySearch()">Search</button>
+      </div>
+
+      <div id="binary-log" style="font-size:11px;color:var(--text-secondary);font-family:monospace;line-height:2;margin:8px 0;"></div>
+      <div class="dsa-result" id="binary-result">Enter a rating and click Search. Array must be sorted first.</div>
+
+      <div class="steps-counter" style="margin-top:8px;">
+        <div class="step-stat">Steps taken: <strong id="binary-steps">—</strong></div>
+        <div class="step-stat">log₂(n): <strong id="binary-logn">—</strong></div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════ -->
+    <!-- PANEL: Bubble Sort                         -->
+    <!-- ══════════════════════════════════════════ -->
+    <div id="panel-bubble-sort" class="dsa-panel hidden">
+      <div class="dsa-panel-title">🫧 Bubble Sort — O(n²)</div>
+      <div class="dsa-panel-desc">
+        <strong>Bubble Sort</strong> repeatedly compares adjacent pairs and swaps if out of order.
+        After each pass, the largest unsorted element "bubbles" to the end.
+        CineBook uses this to sort movies by rating on the home page grid.
+      </div>
+
+      <div class="code-block"><span class="code-keyword">function</span> <span class="code-fn">bubbleSort</span>(arr, key) {
+  <span class="code-keyword">for</span> (<span class="code-keyword">let</span> i = <span class="code-num">0</span>; i &lt; arr.length - <span class="code-num">1</span>; i++) {
+    <span class="code-keyword">let</span> swapped = <span class="code-keyword">false</span>;
+    <span class="code-keyword">for</span> (<span class="code-keyword">let</span> j = <span class="code-num">0</span>; j &lt; arr.length - <span class="code-num">1</span> - i; j++) {
+      <span class="code-keyword">if</span> (arr[j][key] &gt; arr[j+<span class="code-num">1</span>][key]) {
+        [arr[j], arr[j+<span class="code-num">1</span>]] = [arr[j+<span class="code-num">1</span>], arr[j]]; <span class="code-comment">// swap</span>
+        swapped = <span class="code-keyword">true</span>;
+      }
+    }
+    <span class="code-keyword">if</span> (!swapped) <span class="code-keyword">break</span>; <span class="code-comment">// early exit</span>
+  }
+}</div>
+
+      <div class="dsa-controls">
+        <select class="dsa-input" id="bubble-sort-field" style="max-width:150px;">
+          <option value="rating">Sort by Rating</option>
+          <option value="votes">Sort by Votes</option>
+        </select>
+        <select class="dsa-input" id="bubble-sort-order" style="max-width:130px;">
+          <option value="asc">Ascending</option>
+          <option value="desc">Descending</option>
+        </select>
+        <button class="dsa-btn" onclick="runBubbleSort()">Sort</button>
+      </div>
+
+      <div class="sort-array-vis" id="bubble-vis"></div>
+      <div class="sort-step-log" id="bubble-log"></div>
+      <div class="dsa-result" id="bubble-result">Click Sort to run Bubble Sort on the movie dataset.</div>
+      <div class="steps-counter" style="margin-top:8px;">
+        <div class="step-stat">Comparisons: <strong id="bubble-steps">—</strong></div>
+        <div class="step-stat">Swaps: <strong id="bubble-swaps">—</strong></div>
+        <div class="step-stat">Passes: <strong id="bubble-passes">—</strong></div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════ -->
+    <!-- PANEL: Selection Sort                      -->
+    <!-- ══════════════════════════════════════════ -->
+    <div id="panel-selection-sort" class="dsa-panel hidden">
+      <div class="dsa-panel-title">🔢 Selection Sort — O(n²)</div>
+      <div class="dsa-panel-desc">
+        <strong>Selection Sort</strong> finds the minimum (or maximum) of the unsorted portion and places it at the front.
+        Unlike Bubble Sort, it makes at most n-1 swaps — efficient when write operations are costly.
+        CineBook uses this to sort theatres by price in the theatre selection screen.
+      </div>
+
+      <div class="code-block"><span class="code-keyword">function</span> <span class="code-fn">selectionSort</span>(arr, key) {
+  <span class="code-keyword">for</span> (<span class="code-keyword">let</span> i = <span class="code-num">0</span>; i &lt; arr.length - <span class="code-num">1</span>; i++) {
+    <span class="code-keyword">let</span> minIdx = i;
+    <span class="code-keyword">for</span> (<span class="code-keyword">let</span> j = i + <span class="code-num">1</span>; j &lt; arr.length; j++) {
+      <span class="code-keyword">if</span> (arr[j][key] &lt; arr[minIdx][key]) {
+        minIdx = j; <span class="code-comment">// new minimum found</span>
+      }
+    }
+    <span class="code-keyword">if</span> (minIdx !== i) {
+      [arr[i], arr[minIdx]] = [arr[minIdx], arr[i]]; <span class="code-comment">// swap</span>
+    }
+  }
+}</div>
+
+      <div class="dsa-controls">
+        <select class="dsa-input" id="sel-sort-field" style="max-width:150px;">
+          <option value="rating">Sort by Rating</option>
+          <option value="votes">Sort by Votes</option>
+        </select>
+        <select class="dsa-input" id="sel-sort-order" style="max-width:130px;">
+          <option value="asc">Ascending</option>
+          <option value="desc">Descending</option>
+        </select>
+        <button class="dsa-btn" onclick="runSelectionSort()">Sort</button>
+      </div>
+
+      <div class="sort-array-vis" id="sel-vis"></div>
+      <div class="sort-step-log" id="sel-log"></div>
+      <div class="dsa-result" id="sel-result">Click Sort to run Selection Sort on the movie dataset.</div>
+      <div class="steps-counter" style="margin-top:8px;">
+        <div class="step-stat">Comparisons: <strong id="sel-steps">—</strong></div>
+        <div class="step-stat">Swaps: <strong id="sel-swaps">—</strong></div>
+        <div class="step-stat">Passes: <strong id="sel-passes">—</strong></div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════ -->
+    <!-- PANEL: Complexity Table                    -->
+    <!-- ══════════════════════════════════════════ -->
+    <div id="panel-complexity" class="dsa-panel hidden">
+      <div class="dsa-panel-title">📊 Time & Space Complexity Reference</div>
+      <div class="dsa-panel-desc">
+        This table is for viva and examination reference. All complexities are based on the actual
+        implementations in <code style="color:var(--accent);">data-structures.js</code>.
+      </div>
+
+      <div class="complexity-table-wrap">
+        <table class="complexity-table" id="complexity-table">
+          <thead>
+            <tr>
+              <th>Algorithm</th>
+              <th>Best</th>
+              <th>Average</th>
+              <th>Worst</th>
+              <th>Space</th>
+              <th style="min-width:160px;">Notes</th>
+            </tr>
+          </thead>
+          <tbody id="complexity-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── DSA in CineBook summary ──────────────── -->
+    <div class="dsa-panel" style="margin-top:16px;">
+      <div class="dsa-panel-title" style="color:var(--accent);">🎬 Where DSA is Used in CineBook</div>
+      <div style="font-size:12px;color:var(--text-secondary);line-height:2;">
+        <div>📦 <strong style="color:var(--text-primary);">Arrays</strong> — Movie list, theatre list, seat rows, showtime arrays</div>
+        <div>🔗 <strong style="color:var(--text-primary);">Linked List</strong> — Booking history stored as BookingLinkedList</div>
+        <div>🔍 <strong style="color:var(--text-primary);">Linear Search</strong> — Home page movie search bar</div>
+        <div>⚡ <strong style="color:var(--text-primary);">Binary Search</strong> — Finding a movie by numeric rating in sorted array</div>
+        <div>🫧 <strong style="color:var(--text-primary);">Bubble Sort</strong> — Sorting movies by rating in the home grid</div>
+        <div>🔢 <strong style="color:var(--text-primary);">Selection Sort</strong> — Sorting theatres by price in theatre selection</div>
+      </div>
+    </div>
+
+  </div><!-- .dsa-body -->
+</div>
+
+<script src="data.js"></script>
+<script src="data-structures.js"></script>
+<script src="app.js"></script>
+<script>
+"use strict";
+
+// ── Panel switcher ────────────────────────────────────
+const panels = ["arrays","linked-list","linear-search","binary-search","bubble-sort","selection-sort","complexity"];
+
+function showPanel(name, btn) {
+  panels.forEach(p => {
+    const el = document.getElementById("panel-" + p);
+    if (el) el.classList.add("hidden");
+  });
+  const target = document.getElementById("panel-" + name);
+  if (target) target.classList.remove("hidden");
+
+  document.querySelectorAll(".algo-tab-btn").forEach(b => b.classList.remove("active"));
+  if (btn) btn.classList.add("active");
+
+  // Lazy init panels
+  switch (name) {
+    case "arrays":        initArraysPanel();    break;
+    case "linked-list":   initLinkedList();     break;
+    case "linear-search": initLinearSearch();   break;
+    case "binary-search": initBinarySearch();   break;
+    case "bubble-sort":   initBubbleSort();     break;
+    case "selection-sort":initSelectionSort();  break;
+    case "complexity":    initComplexity();     break;
+  }
+}
+
+// ── ARRAYS PANEL ──────────────────────────────────────
+function initArraysPanel() {
+  const tbody = document.getElementById("arrays-table-body");
+  if (!tbody) return;
+  tbody.innerHTML = CineData.MOVIES.map((m, i) => `
+    <tr>
+      <td style="padding:8px;border-bottom:1px solid var(--border-subtle);color:var(--accent);font-weight:700;">[${i}]</td>
+      <td style="padding:8px;border-bottom:1px solid var(--border-subtle);color:var(--text-primary);font-weight:600;">${m.title}</td>
+      <td style="padding:8px;border-bottom:1px solid var(--border-subtle);color:var(--text-secondary);">${m.language}</td>
+      <td style="padding:8px;border-bottom:1px solid var(--border-subtle);color:var(--text-secondary);">${m.rating}</td>
+    </tr>
+  `).join("");
+}
+
+function accessByIndex() {
+  const idx = parseInt(document.getElementById("array-index-input").value);
+  const result = document.getElementById("array-result");
+  if (isNaN(idx)) { result.textContent = "Please enter a valid index number."; return; }
+  if (idx < 0 || idx >= CineData.MOVIES.length) {
+    result.textContent = `Index [${idx}] is out of bounds. Valid range: 0 to ${CineData.MOVIES.length - 1}.\nTime complexity: O(1) — index access is instant regardless of array size.`;
+    return;
+  }
+  const m = CineData.MOVIES[idx];
+  result.textContent = `MOVIES[${idx}] → {
+  title:    "${m.title}",
+  language: "${m.language}",
+  cert:     "${m.certification}",
+  runtime:  "${m.runtime}",
+  rating:   ${m.rating},
+  genres:   [${m.genres.join(", ")}]
+}
+
+Time complexity: O(1) — arrays use index × element_size offset for direct access.`;
+}
+
+// ── LINKED LIST PANEL ─────────────────────────────────
+let demoNodeCounter = 0;
+
+function initLinkedList() {
+  renderLLVisualizer();
+}
+
+function renderLLVisualizer() {
+  const vis = document.getElementById("ll-visualizer");
+  const nodes = DSA.bookingList.toArray();
+  document.getElementById("ll-size").textContent = DSA.bookingList.size();
+
+  if (nodes.length === 0) {
+    vis.innerHTML = `<div style="font-size:12px;color:var(--text-muted);padding:8px;">List is empty. Head → null</div>`;
+    return;
+  }
+
+  vis.innerHTML = nodes.map((node, i) => `
+    <div class="ll-node">
+      ${i === 0 ? `<div style="margin-right:4px;"><div class="ll-head-label">HEAD</div></div>` : ""}
+      <div class="ll-node-box">
+        <div class="ll-node-data">${node.id}</div>
+        <div class="ll-node-next" style="color:var(--text-muted);">|next→|</div>
+      </div>
+      <div class="ll-arrow">→</div>
+    </div>
+  `).join("") + `<div class="ll-null">null</div>`;
+}
+
+function insertDemoNode() {
+  demoNodeCounter++;
+  const demoBooking = {
+    id: "DEMO" + demoNodeCounter.toString().padStart(3, "0"),
+    movieTitle: "Demo Booking",
+    theatreName: "Demo Theatre",
+    date: "23 Oct",
+    showTime: "11:00 PM",
+    showFormat: "Standard",
+    seats: [{ id: "D" + demoNodeCounter, price: 290 }],
+    total: 290,
+    guestName: "Demo User",
+    status: "confirmed",
+    createdAt: new Date().toISOString()
+  };
+  DSA.bookingList.insertAtHead(demoBooking);
+  document.getElementById("ll-result").textContent =
+    `insertAtHead("${demoBooking.id}") → O(1)\nnewNode.next = head; head = newNode;\n\nInserted node "${demoBooking.id}" at the head in constant time.`;
+  renderLLVisualizer();
+}
+
+function traverseList() {
+  const nodes = DSA.bookingList.toArray();
+  let steps = 0;
+  let current = DSA.bookingList.head;
+  const path = [];
+  while (current !== null) {
+    steps++;
+    path.push(current.data.id);
+    current = current.next;
+  }
+  document.getElementById("ll-steps").textContent = steps;
+  document.getElementById("ll-result").textContent =
+    `traverse() → O(n) where n = ${nodes.length}\n\nVisited: ${path.join(" → ")} → null\nTotal steps: ${steps}`;
+}
+
+function searchInList() {
+  const id = document.getElementById("ll-search-input").value.trim();
+  if (!id) {
+    document.getElementById("ll-result").textContent = "Please enter a booking ID to search.";
+    return;
+  }
+  const node = DSA.bookingList.searchById(id);
+  let steps = 0;
+  let cur = DSA.bookingList.head;
+  while (cur !== null) {
+    steps++;
+    if (cur.data.id === id) break;
+    cur = cur.next;
+  }
+  document.getElementById("ll-steps").textContent = steps;
+  document.getElementById("ll-result").textContent = node
+    ? `searchById("${id}") → FOUND at step ${steps}\n\nData: ${JSON.stringify(node.data, null, 2).slice(0, 200)}…\n\nTime: O(n) — must traverse until found.`
+    : `searchById("${id}") → NOT FOUND after ${steps} steps\n\nTraversed entire list of ${DSA.bookingList.size()} nodes.\nTime: O(n)`;
+}
+
+// ── LINEAR SEARCH PANEL ───────────────────────────────
+function initLinearSearch() {
+  renderLinearSearchVis([]);
+  document.getElementById("linear-n").textContent = CineData.MOVIES.length;
+}
+
+function renderLinearSearchVis(highlightData) {
+  const vis = document.getElementById("linear-search-vis");
+  vis.innerHTML = CineData.MOVIES.map((m, i) => {
+    const h = highlightData.find(h => h.idx === i);
+    const cls = h ? (h.found ? "search-highlight" : "search-scan") : "";
+    return `
+      <div style="display:flex;align-items:center;gap:10px;background:var(--bg-surface);border:1.5px solid var(--border-subtle);border-radius:var(--radius-md);padding:8px 12px;transition:all 0.2s;${cls?'outline:1.5px solid var(--accent)':''}" class="${cls}">
+        <span style="color:var(--accent);font-weight:700;min-width:24px;">[${i}]</span>
+        <span style="font-size:12px;font-weight:600;${h&&h.found?'color:var(--accent)':''}">${m.title}</span>
+        <span style="margin-left:auto;font-size:11px;color:var(--text-muted);">${h ? (h.found?"✓ FOUND":"⟳ checked") : ""}</span>
+      </div>
+    `;
+  }).join("");
+}
+
+async function runLinearSearch() {
+  const q = document.getElementById("linear-search-input").value.trim();
+  if (!q) return;
+
+  const resultEl = document.getElementById("linear-result");
+  resultEl.textContent = "Searching…";
+
+  // Animate step by step
+  const matches = [];
+  for (let i = 0; i < CineData.MOVIES.length; i++) {
+    await delay(300);
+    const found = CineData.MOVIES[i].title.toLowerCase().includes(q.toLowerCase());
+    matches.push({ idx: i, found });
+    renderLinearSearchVis(matches);
+    if (found) break;
+  }
+
+  const result = DSA.linearSearch(CineData.MOVIES, q, "title");
+  document.getElementById("linear-steps").textContent = result.steps;
+
+  if (result.found) {
+    resultEl.textContent = `Found "${result.item.title}" at index [${result.index}] after ${result.steps} step(s).\n\nBest case O(1): found at index 0\nWorst case O(n): must check all ${CineData.MOVIES.length} elements.`;
+  } else {
+    resultEl.textContent = `"${q}" not found. Searched all ${result.steps} elements.\n\nWorst case O(n) = O(${CineData.MOVIES.length}) in this dataset.`;
+    renderLinearSearchVis(CineData.MOVIES.map((_, i) => ({ idx: i, found: false })));
+  }
+}
+
+// ── BINARY SEARCH PANEL ───────────────────────────────
+let sortedMoviesForBinary = [];
+
+function initBinarySearch() {
+  sortedMoviesForBinary = DSA.bubbleSort(CineData.MOVIES, "rating", "asc").sorted;
+  renderBinaryVis([], null);
+}
+
+function renderBinaryVis(log, foundIdx) {
+  const vis = document.getElementById("binary-sorted-vis");
+  vis.innerHTML = sortedMoviesForBinary.map((m, i) => {
+    let style = "background:var(--bg-surface);border:1.5px solid var(--border);border-radius:var(--radius-md);padding:8px 10px;min-width:70px;text-align:center;font-size:10px;font-weight:600;transition:all 0.2s;";
+    if (foundIdx === i) style += "background:var(--accent-dim);border-color:var(--accent);color:var(--accent);";
+    const lastLog = log.find(l => l.mid === i);
+    if (lastLog && foundIdx !== i) style += "background:rgba(245,166,35,0.1);border-color:var(--gold);";
+    return `<div style="${style}">${m.rating}<br><span style="color:var(--text-muted);font-weight:400;">${m.title.split(" ")[0]}</span></div>`;
+  }).join("");
+}
+
+async function runBinarySearch() {
+  const target = parseFloat(document.getElementById("binary-search-input").value);
+  const resultEl = document.getElementById("binary-result");
+  const logEl    = document.getElementById("binary-log");
+
+  if (isNaN(target)) { resultEl.textContent = "Please enter a valid rating number."; return; }
+
+  const result = DSA.binarySearch(sortedMoviesForBinary, target, "rating");
+  document.getElementById("binary-steps").textContent = result.steps;
+  document.getElementById("binary-logn").textContent  = Math.ceil(Math.log2(sortedMoviesForBinary.length || 1));
+
+  // Animate
+  logEl.innerHTML = "";
+  for (const step of (result.log || [])) {
+    await delay(600);
+    renderBinaryVis(result.log.slice(0, result.log.indexOf(step) + 1), result.found ? result.index : null);
+    logEl.innerHTML += `Step ${result.log.indexOf(step)+1}: lo=${step.lo}, hi=${step.hi}, mid=${step.mid} → arr[mid].rating=${step.midVal} ${step.comparison} ${target}<br>`;
+  }
+
+  if (result.found) {
+    resultEl.textContent = `Found "${result.item.title}" (rating ${result.item.rating}) at index [${result.index}] in ${result.steps} step(s).\n\nBinary search is O(log n) = O(log ${sortedMoviesForBinary.length}) ≈ ${Math.ceil(Math.log2(sortedMoviesForBinary.length))} max steps.`;
+  } else {
+    resultEl.textContent = `Rating ${target} not found after ${result.steps} step(s).\n\nNote: Binary search only finds exact matches. Try ${sortedMoviesForBinary.map(m=>m.rating).join(", ")}.`;
+    renderBinaryVis(result.log || [], null);
+  }
+}
+
+// ── BUBBLE SORT PANEL ─────────────────────────────────
+function initBubbleSort() {
+  const field = document.getElementById("bubble-sort-field").value;
+  renderSortBars("bubble-vis", CineData.MOVIES, field, "normal");
+}
+
+function renderSortBars(visId, arr, key, state) {
+  const vis = document.getElementById(visId);
+  if (!vis) return;
+  const maxVal = Math.max(...arr.map(m => m[key] || 0));
+  vis.innerHTML = arr.map((m, i) => {
+    const height = Math.max(20, ((m[key] || 0) / maxVal) * 70);
+    return `
+      <div class="sort-bar normal" style="height:${height}px;background:var(--accent);">
+        <span style="font-size:9px;position:absolute;bottom:-18px;left:0;right:0;text-align:center;color:var(--text-muted);">${m[key]}</span>
+      </div>
+    `;
+  }).join("");
+}
+
+async function runBubbleSort() {
+  const field = document.getElementById("bubble-sort-field").value;
+  const order = document.getElementById("bubble-sort-order").value;
+  const result = DSA.bubbleSort(CineData.MOVIES, field, order);
+
+  document.getElementById("bubble-steps").textContent  = result.steps;
+  document.getElementById("bubble-swaps").textContent  = result.swaps;
+  document.getElementById("bubble-passes").textContent = result.passes;
+
+  // Animate final result
+  renderSortBars("bubble-vis", result.sorted, field, "sorted");
+
+  const maxVal = Math.max(...result.sorted.map(m => m[field] || 0));
+  const vis = document.getElementById("bubble-vis");
+  vis.innerHTML = result.sorted.map(m => {
+    const h = Math.max(20, ((m[field] || 0) / maxVal) * 70);
+    return `<div class="sort-bar" style="height:${h}px;background:var(--green);">
+      <span style="font-size:9px;position:absolute;bottom:-18px;left:0;right:0;text-align:center;color:var(--text-muted);">${m[field]}</span>
+    </div>`;
+  }).join("");
+
+  const log = document.getElementById("bubble-log");
+  log.innerHTML = result.log.slice(0, 20).map(l =>
+    `Pass ${l.pass}: Compare [${l.comparing[0]}] & [${l.comparing[1]}] (${l.values.join(" vs ")}) → ${l.swapped ? "SWAP" : "no swap"}`
+  ).join("\n") + (result.log.length > 20 ? `\n… and ${result.log.length - 20} more comparisons` : "");
+
+  document.getElementById("bubble-result").textContent =
+    `Sorted ${CineData.MOVIES.length} movies by ${field} (${order}) in ${result.passes} pass(es).\n${result.steps} comparisons, ${result.swaps} swaps.\n\nTime: O(n²) worst case. With early exit: O(n) best case (already sorted).`;
+}
+
+// ── SELECTION SORT PANEL ──────────────────────────────
+function initSelectionSort() {
+  const field = document.getElementById("sel-sort-field").value;
+  renderSortBars("sel-vis", CineData.MOVIES, field, "normal");
+}
+
+async function runSelectionSort() {
+  const field = document.getElementById("sel-sort-field").value;
+  const order = document.getElementById("sel-sort-order").value;
+  const result = DSA.selectionSort(CineData.MOVIES, field, order);
+
+  document.getElementById("sel-steps").textContent  = result.steps;
+  document.getElementById("sel-swaps").textContent  = result.swaps;
+  document.getElementById("sel-passes").textContent = result.passes;
+
+  const maxVal = Math.max(...result.sorted.map(m => m[field] || 0));
+  const vis = document.getElementById("sel-vis");
+  vis.innerHTML = result.sorted.map(m => {
+    const h = Math.max(20, ((m[field] || 0) / maxVal) * 70);
+    return `<div class="sort-bar" style="height:${h}px;background:var(--blue);">
+      <span style="font-size:9px;position:absolute;bottom:-18px;left:0;right:0;text-align:center;color:var(--text-muted);">${m[field]}</span>
+    </div>`;
+  }).join("");
+
+  const log = document.getElementById("sel-log");
+  const swapLogs = result.log.filter(l => l.swapped !== undefined);
+  log.innerHTML = swapLogs.map(l =>
+    `Pass ${l.pass}: Swapped positions [${l.swapped[0]}] & [${l.swapped[1]}]`
+  ).join("\n") || "No swaps needed — array already sorted!";
+
+  document.getElementById("sel-result").textContent =
+    `Sorted ${CineData.MOVIES.length} movies by ${field} (${order}).\n${result.steps} comparisons, ${result.swaps} swap(s) (max n-1 = ${CineData.MOVIES.length - 1}).\n\nSelection Sort always makes n*(n-1)/2 comparisons → O(n²).\nBut at most n-1 swaps — useful when writes are expensive.`;
+}
+
+// ── COMPLEXITY TABLE ──────────────────────────────────
+function initComplexity() {
+  const tbody = document.getElementById("complexity-tbody");
+  if (!tbody || tbody.innerHTML) return;
+
+  tbody.innerHTML = DSA.COMPLEXITY_TABLE.map(r => {
+    function tc(val) {
+      if (!val) return `<td style="padding:8px 12px;border-bottom:1px solid var(--border-subtle);">—</td>`;
+      let cls = "";
+      if (val.includes("n²"))  cls = "tc-n2";
+      else if (val.includes("log")) cls = "tc-logn";
+      else if (val === "O(n)") cls = "tc-n";
+      else if (val === "O(1)") cls = "tc-1";
+      return `<td class="${cls}" style="padding:8px 12px;border-bottom:1px solid var(--border-subtle);">${val}</td>`;
+    }
+    return `<tr>
+      <td class="tc-name" style="padding:8px 12px;border-bottom:1px solid var(--border-subtle);">${r.algorithm}</td>
+      ${tc(r.best)}${tc(r.average)}${tc(r.worst)}${tc(r.space)}
+      <td style="padding:8px 12px;border-bottom:1px solid var(--border-subtle);color:var(--text-secondary);font-size:10px;">${r.notes}</td>
+    </tr>`;
+  }).join("");
+}
+
+// ── Helpers ───────────────────────────────────────────
+function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// ── Init ──────────────────────────────────────────────
+document.addEventListener("DOMContentLoaded", () => {
+  initArraysPanel(); // default tab
+});
+</script>
+</body>
+</html>

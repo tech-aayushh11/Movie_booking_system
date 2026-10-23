@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Udta Teer — Hindi spy comedy starring Ayushmann Khurrana and Sara Ali Khan, directed by Akash A. Kaushik. UA13+ | 2h 18m | Released 23rd October.">
+  <title>Udta Teer — CineBook</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="page" id="movie-page">
+
+  <!-- ── Sub-page Bar ───────────────────────────── -->
+  <nav class="subpage-bar">
+    <button class="icon-btn" onclick="App.goBack()" aria-label="Go back">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 12H5M12 5l-7 7 7 7"/>
+      </svg>
+    </button>
+    <div class="subpage-bar-center">
+      <div class="subpage-title" id="nav-title">Udta Teer</div>
+    </div>
+    <div class="topbar-actions">
+      <button class="icon-btn" aria-label="Share movie" onclick="App.showToast('Share link copied!','success')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+        </svg>
+      </button>
+      <button class="icon-btn" id="hype-nav-btn" aria-label="Hype this movie">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+        </svg>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ── Cinematic Backdrop ─────────────────────── -->
+  <div class="movie-backdrop-wrap" id="backdrop-wrap">
+    <img src="backdrop.jpg" alt="Udta Teer backdrop" id="backdrop-img"
+      onerror="document.getElementById('backdrop-wrap').style.background='linear-gradient(135deg,#0d1b2a 0%,#1a2a3a 40%,#2d4a6a 100%)'">
+    <div class="movie-backdrop-gradient"></div>
+  </div>
+
+  <!-- ── Movie Body ─────────────────────────────── -->
+  <main class="movie-detail-body page-center" id="movie-body">
+
+    <!-- Poster + Title row -->
+    <div style="display:flex;gap:14px;align-items:flex-start;margin-top:-30px;position:relative;z-index:2;padding-top:0;">
+      <div style="width:90px;height:130px;border-radius:10px;overflow:hidden;border:2px solid var(--border);flex-shrink:0;box-shadow:0 8px 24px rgba(0,0,0,0.6);">
+        <img src="poster.jpg" alt="Udta Teer poster" style="width:100%;height:100%;object-fit:cover;" id="poster-img"
+          onerror="this.parentElement.innerHTML='<div style=\'width:100%;height:100%;background:linear-gradient(135deg,#1a2a3a,#2d4a6a);display:flex;align-items:center;justify-content:center;font-size:32px;\'>🎬</div>'">
+      </div>
+      <div style="flex:1;padding-top:8px;">
+        <h1 class="movie-title-lg" id="movie-title">Udta Teer</h1>
+        <div class="movie-cert-row" id="movie-cert">
+          <span class="cert-badge" id="cert">UA13+</span>
+          <span class="separator">|</span>
+          <span id="lang">Hindi</span>
+          <span class="separator">|</span>
+          <span id="runtime">2h 18m</span>
+        </div>
+        <div class="movie-release" id="release">Released on 23rd October</div>
+      </div>
+    </div>
+
+    <!-- Hype row -->
+    <div class="hype-row">
+      <span class="hype-count" id="hype-count">⚡ 5.6k+ fans are hyped!</span>
+      <button class="hype-btn" id="hype-btn" onclick="toggleHype()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+        </svg>
+        Join the Hype
+      </button>
+    </div>
+
+    <!-- Synopsis -->
+    <div>
+      <p class="synopsis" id="synopsis-text">
+        Ayushmann Khurrana and Sara Ali Khan lead this high-energy spy comedy, directed by Akash A. Kaushik. Packed with a…
+      </p>
+      <button class="synopsis-toggle" id="synopsis-toggle" onclick="toggleSynopsis()">View more</button>
+    </div>
+
+    <!-- Genre tags -->
+    <div class="genres-row" id="genres-row">
+      <span class="chip">🕵️ Spy</span>
+      <span class="chip">😄 Comedy</span>
+    </div>
+
+    <!-- Offer banner -->
+    <div class="offer-banner">
+      <div class="offer-icon">✅</div>
+      <div class="offer-text">
+        <strong>Get 25% OFF up to ₹250 on YES BANK Elite+ Credit Ca…</strong>
+      </div>
+      <span class="offer-count">31 offers &rsaquo;</span>
+    </div>
+
+    <!-- Buzz section -->
+    <h2 class="section-heading">Buzz around this movie</h2>
+    <div class="highlights-grid" id="highlights-grid"></div>
+
+    <!-- Cast & Crew -->
+    <h2 class="section-heading">Cast and crew</h2>
+    <div class="cast-list" id="cast-list"></div>
+
+    <div style="padding-bottom:80px;"></div>
+  </main>
+
+  <!-- ── Sticky Book Bar ────────────────────────── -->
+  <div class="book-bar">
+    <button class="btn btn-primary btn-full btn-lg" id="book-btn" onclick="bookTickets()">
+      Book Tickets
+    </button>
+  </div>
+</div>
+
+<script src="data.js"></script>
+<script src="data-structures.js"></script>
+<script src="app.js"></script>
+<script>
+"use strict";
+
+let movie = null;
+let synopsisExpanded = false;
+let hyped = false;
+
+const FULL_SYNOPSIS = "Ayushmann Khurrana and Sara Ali Khan lead this high-energy spy comedy, directed by Akash A. Kaushik. Packed with laugh-out-loud moments and unexpected twists, the film follows a bumbling spy who forgets he works for Pakistan and accidentally starts working against his own bosses. A rollercoaster of mistaken identities, double agents, and comic chaos that will keep you guessing until the very end.";
+const SHORT_SYNOPSIS = "Ayushmann Khurrana and Sara Ali Khan lead this high-energy spy comedy, directed by Akash A. Kaushik. Packed with a…";
+
+function toggleSynopsis() {
+  synopsisExpanded = !synopsisExpanded;
+  document.getElementById("synopsis-text").textContent = synopsisExpanded ? FULL_SYNOPSIS : SHORT_SYNOPSIS;
+  document.getElementById("synopsis-toggle").textContent = synopsisExpanded ? "Show less" : "View more";
+}
+
+function toggleHype() {
+  hyped = !hyped;
+  const btn = document.getElementById("hype-btn");
+  const count = document.getElementById("hype-count");
+  btn.classList.toggle("active", hyped);
+  btn.innerHTML = hyped
+    ? `<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg> Hyped!`
+    : `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg> Join the Hype`;
+  count.textContent = hyped ? "⚡ 5.6k+1 fans are hyped!" : "⚡ 5.6k+ fans are hyped!";
+  App.showToast(hyped ? "🔥 You joined the hype!" : "Removed from hype", hyped ? "success" : "info");
+}
+
+function renderHighlights() {
+  const grid = document.getElementById("highlights-grid");
+  if (!movie || !grid) return;
+  grid.innerHTML = movie.highlights.map(h => `
+    <div class="highlight-card">
+      <div class="highlight-icon">${h.icon}</div>
+      <div class="highlight-title">${h.title}</div>
+      <div class="highlight-desc">${h.description}</div>
+    </div>
+  `).join("");
+}
+
+function renderCast() {
+  const castList = document.getElementById("cast-list");
+  if (!movie || !castList) return;
+
+  const castData = [
+    { name: "Ayushmann Khurrana", role: "Lead Actor", avatar: "🧑" },
+    { name: "Sara Ali Khan", role: "Lead Actress", avatar: "👩" },
+    { name: "Akash A. Kaushik", role: "Director", avatar: "🎬" }
+  ];
+
+  castList.innerHTML = castData.map(c => `
+    <div class="cast-item">
+      <div class="cast-avatar">${c.avatar}</div>
+      <div class="cast-name">${c.name.split(" ")[0]}</div>
+      <div class="cast-role">${c.role}</div>
+    </div>
+  `).join("") + `
+    <div class="cast-item" style="cursor:pointer;" onclick="App.showToast('Full crew details coming soon','info')">
+      <div class="cast-avatar" style="background:var(--bg-surface-2);color:var(--accent);">+12</div>
+      <div class="cast-name">View All</div>
+      <div class="cast-role">Crew</div>
+    </div>
+  `;
+}
+
+function bookTickets() {
+  if (!movie) return;
+  App.Session.setMovie(movie.id);
+  window.location.href = "theatres.html?movie=" + movie.id;
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const movieId = App.getParam("id") || "udta-teer";
+  movie = CineData.getMovieById(movieId);
+
+  if (!movie) {
+    document.getElementById("movie-body").innerHTML = `
+      <div class="empty-state">
+        <div class="empty-state-icon">🎬</div>
+        <div class="empty-state-title">Movie not found</div>
+        <div class="empty-state-desc">The movie you're looking for doesn't exist.</div>
+        <button class="btn btn-primary" onclick="window.location.href='index.html'" style="margin-top:20px;">Go Home</button>
+      </div>`;
+    return;
+  }
+
+  App.Session.setMovie(movie.id);
+  document.title = `${movie.title} — CineBook`;
+  renderHighlights();
+  renderCast();
+});
+</script>
+</body>
+</html>

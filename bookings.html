@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="View and manage your CineBook movie ticket bookings.">
+  <title>My Bookings — CineBook</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="page" id="bookings-page">
+
+  <!-- ── Sub-page Bar ───────────────────────────── -->
+  <nav class="subpage-bar">
+    <button class="icon-btn" onclick="window.location.href='index.html'" aria-label="Go home">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 12H5M12 5l-7 7 7 7"/>
+      </svg>
+    </button>
+    <div class="subpage-bar-center">
+      <div class="subpage-title">My Bookings</div>
+      <div class="subpage-meta" id="booking-count-meta">Loading…</div>
+    </div>
+    <button class="icon-btn" id="clear-all-btn" aria-label="Clear all bookings" onclick="clearAllBookings()" title="Clear all bookings (demo reset)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+      </svg>
+    </button>
+  </nav>
+
+  <!-- ── Bookings Body ──────────────────────────── -->
+  <main class="bookings-body" id="bookings-body">
+    <!-- rendered by JS -->
+  </main>
+
+  <!-- ── Footer ─────────────────────────────────── -->
+  <div style="position:sticky;bottom:0;background:rgba(17,17,19,0.96);backdrop-filter:blur(12px);border-top:1px solid var(--border-subtle);padding:12px 16px;padding-bottom:max(12px,env(safe-area-inset-bottom));">
+    <button class="btn btn-outline btn-full" onclick="window.location.href='index.html'">
+      ← Back to Home
+    </button>
+  </div>
+</div>
+
+<!-- Cancel Confirmation Dialog -->
+<div id="cancel-dialog" class="hidden" style="position:fixed;inset:0;z-index:300;background:rgba(0,0,0,0.7);display:flex;align-items:flex-end;justify-content:center;">
+  <div style="background:var(--bg-card);border-radius:var(--radius-xl) var(--radius-xl) 0 0;padding:24px 20px;width:100%;max-width:480px;border-top:1px solid var(--border);">
+    <h2 style="font-size:17px;font-weight:700;margin-bottom:8px;">Cancel Booking?</h2>
+    <p style="font-size:13px;color:var(--text-secondary);margin-bottom:20px;">
+      This will cancel your booking and release your seats. This action cannot be undone.
+    </p>
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-outline" style="flex:1;" onclick="closeCancelDialog()">Keep Booking</button>
+      <button class="btn btn-danger" style="flex:1;" id="confirm-cancel-btn" onclick="executeCancel()">Cancel Booking</button>
+    </div>
+  </div>
+</div>
+
+<script src="data.js"></script>
+<script src="data-structures.js"></script>
+<script src="app.js"></script>
+<script>
+"use strict";
+
+let cancelTargetId = null;
+
+// ── Render Bookings ───────────────────────────────────
+function renderBookings() {
+  const body = document.getElementById("bookings-body");
+  const bookings = DSA.getAllBookings();
+
+  const meta = document.getElementById("booking-count-meta");
+  const total = bookings.length;
+  const confirmed = bookings.filter(b => b.status === "confirmed").length;
+  meta.textContent = `${total} booking${total !== 1 ? "s" : ""} · ${confirmed} active`;
+
+  if (bookings.length === 0) {
+    body.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-state-icon">🎟️</div>
+        <div class="empty-state-title">No Bookings Yet</div>
+        <div class="empty-state-desc">
+          You haven't booked any tickets yet.<br>
+          Find a movie and reserve your seats!
+        </div>
+        <button class="btn btn-primary" onclick="window.location.href='index.html'" style="margin-top:24px;">
+          Browse Movies
+        </button>
+      </div>
+    `;
+    return;
+  }
+
+  body.innerHTML = bookings.map(booking => renderBookingCard(booking)).join("");
+
+  // Bind cancel buttons
+  body.querySelectorAll(".cancel-booking-btn[data-booking-id]").forEach(btn => {
+    btn.addEventListener("click", () => openCancelDialog(btn.dataset.bookingId));
+  });
+}
+
+function renderBookingCard(booking) {
+  const isCancelled = booking.status === "cancelled";
+  const seats = Array.isArray(booking.seats)
+    ? booking.seats.map(s => s.id).join(", ")
+    : "—";
+
+  const bookingDate = new Date(booking.createdAt);
+  const timeStr = isNaN(bookingDate)
+    ? ""
+    : ` · Booked ${bookingDate.toLocaleDateString("en-IN", { day:"numeric", month:"short" })}`;
+
+  const cancelBtn = !isCancelled
+    ? `<button class="btn btn-danger cancel-booking-btn" data-booking-id="${booking.id}"
+        style="padding:6px 14px;height:34px;font-size:12px;">Cancel</button>`
+    : `<span style="font-size:11px;color:var(--text-muted);">Cancelled on ${new Date(booking.cancelledAt||"").toLocaleDateString("en-IN",{day:"numeric",month:"short"})||""}</span>`;
+
+  return `
+    <div class="booking-list-item ${isCancelled ? "cancelled" : ""}" id="booking-${booking.id}">
+      <div class="booking-item-header">
+        <div class="booking-item-movie">${booking.movieTitle}</div>
+        <div class="booking-status-badge ${isCancelled ? "status-cancelled" : "status-confirmed"}">
+          ${isCancelled ? "Cancelled" : "Confirmed"}
+        </div>
+      </div>
+
+      <div class="booking-item-meta">
+        <strong>${booking.theatreName}</strong><br>
+        ${booking.date} · ${booking.showTime}${booking.showFormat && booking.showFormat !== "Standard" ? " · " + booking.showFormat : ""}<br>
+        Seats: <strong>${seats}</strong>${timeStr}
+      </div>
+
+      <div class="booking-item-footer">
+        <div>
+          <div class="booking-item-total">₹${booking.total.toLocaleString("en-IN")}</div>
+          <div class="booking-item-id">${booking.id}</div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <button class="btn btn-ghost" style="padding:6px 12px;height:34px;font-size:12px;"
+            onclick="window.location.href='confirmation.html?id=${booking.id}'">
+            View Ticket
+          </button>
+          ${cancelBtn}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ── Cancel Dialog ─────────────────────────────────────
+function openCancelDialog(bookingId) {
+  cancelTargetId = bookingId;
+  document.getElementById("cancel-dialog").classList.remove("hidden");
+  document.getElementById("cancel-dialog").style.display = "flex";
+}
+function closeCancelDialog() {
+  cancelTargetId = null;
+  document.getElementById("cancel-dialog").classList.add("hidden");
+  document.getElementById("cancel-dialog").style.display = "";
+}
+function executeCancel() {
+  if (!cancelTargetId) return;
+
+  const booking = DSA.getBookingById(cancelTargetId);
+  if (!booking) { closeCancelDialog(); return; }
+
+  // Release seats in LocalStorage
+  const seatIds = booking.seats.map(s => s.id);
+  DSA.releaseSeats(booking.theatreId, booking.showId, seatIds);
+
+  // Update booking status in linked list
+  DSA.cancelBooking(cancelTargetId);
+
+  closeCancelDialog();
+  App.showToast("Booking cancelled. Seats released.", "info");
+  renderBookings();
+}
+
+// ── Clear All (demo reset) ────────────────────────────
+function clearAllBookings() {
+  if (!confirm("Delete all bookings and reset seat availability? This is a demo reset.")) return;
+  localStorage.removeItem("cinebook_bookings");
+  // Clear all seat availability keys
+  const keys = Object.keys(localStorage).filter(k => k.startsWith("cinebook_seats_"));
+  keys.forEach(k => localStorage.removeItem(k));
+  // Reset linked list
+  DSA.bookingList.head = null;
+  DSA.bookingList.count = 0;
+  renderBookings();
+  App.showToast("All demo bookings cleared.", "info");
+}
+
+// ── Init ──────────────────────────────────────────────
+document.addEventListener("DOMContentLoaded", renderBookings);
+
+// Close dialog when clicking backdrop
+document.getElementById("cancel-dialog")?.addEventListener("click", function(e) {
+  if (e.target === this) closeCancelDialog();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Select your cinema seats for Udta Teer at CineBook. Interactive seat map with real-time pricing.">
+  <title>Select Seats — CineBook</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* Extra seat-page specific styles */
+    .seat-page-body { padding-bottom: 0; }
+    .seat-info-bar {
+      padding: 10px 16px;
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .seat-info-theatre { font-size: 13px; font-weight: 600; }
+    .seat-info-meta    { font-size: 11px; color: var(--text-secondary); }
+
+    /* Category separator rows */
+    .cat-separator {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 14px 0 6px;
+      padding: 0 2px;
+    }
+    .cat-sep-line { height: 1px; background: var(--border-subtle); flex: 1; }
+    .cat-sep-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+    .cat-sep-name {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    .cat-sep-price {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--accent);
+      background: var(--accent-dim-2);
+      border: 1px solid rgba(118,80,255,0.2);
+      border-radius: var(--radius-full);
+      padding: 1px 8px;
+    }
+
+    .seat-map-container {
+      padding: 0 0 8px;
+      overflow: hidden;
+    }
+
+    /* Limit selection notice */
+    .limit-notice {
+      text-align: center;
+      font-size: 11px;
+      color: var(--text-muted);
+      padding: 4px 0 8px;
+    }
+
+    /* Max seats alert */
+    .max-seats-alert {
+      display: none;
+      background: var(--orange-dim);
+      border: 1px solid rgba(255,149,0,0.3);
+      border-radius: var(--radius-md);
+      padding: 8px 12px;
+      font-size: 12px;
+      color: var(--orange);
+      text-align: center;
+      margin: 0 16px 8px;
+    }
+    .max-seats-alert.visible { display: block; }
+  </style>
+</head>
+<body>
+<div class="page" id="seats-page">
+
+  <!-- ── Sub-page Bar ───────────────────────────── -->
+  <nav class="subpage-bar">
+    <button class="icon-btn" onclick="App.goBack()" aria-label="Go back">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 12H5M12 5l-7 7 7 7"/>
+      </svg>
+    </button>
+    <div class="subpage-bar-center">
+      <div class="subpage-title">Udta Teer</div>
+      <div class="subpage-meta" id="nav-show-meta">Loading…</div>
+    </div>
+    <div class="topbar-actions">
+      <button class="icon-btn" aria-label="Share seat map" onclick="App.showToast('Share link copied!','success')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+        </svg>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ── Theatre / Show Info Bar ───────────────── -->
+  <div class="seat-info-bar">
+    <div class="seat-info-theatre" id="info-theatre">Cinepolis Seasons Mall, Hadapsar, Pune</div>
+    <div class="seat-info-meta" id="info-meta">23 Oct (Fri) · Loading show…</div>
+  </div>
+
+  <!-- ── Showtime Switcher (for Cinepolis) ─────── -->
+  <div class="showtime-switcher" id="showtime-switcher">
+    <!-- rendered by JS for cinepolis only -->
+  </div>
+
+  <!-- ── Seat Legend ────────────────────────────── -->
+  <div class="seat-legend">
+    <div class="legend-item">
+      <div class="legend-dot legend-recommended"></div>
+      <span>Best Seats</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot legend-available"></div>
+      <span>Available</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot legend-occupied"></div>
+      <span>Occupied</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot legend-selected"></div>
+      <span>Selected</span>
+    </div>
+  </div>
+
+  <!-- ── Seat Map ───────────────────────────────── -->
+  <div class="seat-map-container">
+    <div class="seat-map-outer">
+      <div class="seat-map" id="seat-map" role="grid" aria-label="Cinema seat map">
+        <!-- rendered by JS -->
+      </div>
+    </div>
+
+    <!-- Screen Indicator -->
+    <div class="screen-indicator">
+      <div class="screen-bar"></div>
+      <div class="screen-label">◀ SCREEN ▶</div>
+    </div>
+
+    <div class="limit-notice">Maximum 6 seats per booking</div>
+  </div>
+
+  <!-- Max seats alert -->
+  <div class="max-seats-alert" id="max-seats-alert">
+    ⚠ You can select a maximum of 6 seats per booking.
+  </div>
+
+  <!-- ── Sticky Booking Summary ─────────────────── -->
+  <div class="booking-summary" id="booking-summary">
+    <div class="booking-summary-top">
+      <div>
+        <div class="selected-seats-display">
+          <strong id="seats-count">0 seats</strong> selected
+        </div>
+        <div id="selected-seat-labels" style="font-size:11px;color:var(--accent);margin-top:2px;min-height:16px;"></div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-size:11px;color:var(--text-secondary);">Total</div>
+        <div class="booking-total">₹<span id="total-price">0</span></div>
+      </div>
+    </div>
+    <button class="btn btn-primary btn-full" id="continue-btn" onclick="proceedToCheckout()" disabled
+      style="opacity:0.4;cursor:not-allowed;" aria-disabled="true">
+      Continue
+    </button>
+  </div>
+</div>
+
+<script src="data.js"></script>
+<script src="data-structures.js"></script>
+<script src="app.js"></script>
+<script>
+"use strict";
+
+// ── State ─────────────────────────────────────────────
+const MAX_SEATS = 6;
+let selectedSeats = []; // array of seat objects {id, row, num, category, price, state}
+let currentTheatreId = "";
+let currentShowId = "";
+let currentDate = "";
+let currentTheatre = null;
+let currentShow = null;
+let seatLayout = []; // deep copy of layout for this show
+
+// ── Init ──────────────────────────────────────────────
+document.addEventListener("DOMContentLoaded", () => {
+  currentTheatreId = App.getParam("theatre") || App.Session.getTheatre() || "cinepolis-seasons";
+  currentShowId    = App.getParam("show")    || App.Session.getShow()    || "";
+  currentDate      = App.getParam("date")    ? decodeURIComponent(App.getParam("date")) : (App.Session.getDate() || "23 Oct");
+
+  currentTheatre = CineData.getTheatreById(currentTheatreId);
+  if (!currentTheatre) { showError("Theatre not found."); return; }
+
+  // Resolve the current show
+  const showResult = CineData.getShowById(currentTheatreId, currentShowId);
+  currentShow = showResult ? showResult.show : null;
+
+  // Fallback: use first available show for this date
+  if (!currentShow) {
+    const shows = CineData.getShowsByTheatreAndDate(currentTheatreId, currentDate);
+    currentShow = shows.find(s => s.time !== null) || null;
+    if (currentShow) currentShowId = currentShow.id;
+  }
+
+  if (!currentShow) { showError("No shows available for the selected date."); return; }
+
+  // Load seat layout for this show
+  const layoutId = CineData.getSeatLayoutKey(currentTheatreId, currentShowId);
+  seatLayout = CineData.getSeatLayout(layoutId);
+
+  // Merge with booked seats from LocalStorage
+  applyOccupiedSeats();
+
+  // Render page
+  updateInfoBar();
+  renderShowtimeSwitcher();
+  renderSeatMap();
+  updateSummary();
+});
+
+// ── Apply Occupied Seats from LocalStorage ────────────
+function applyOccupiedSeats() {
+  const occupied = DSA.getOccupiedSeats(currentTheatreId, currentShowId);
+  seatLayout.forEach(rowObj => {
+    rowObj.seats.forEach(seat => {
+      if (occupied.includes(seat.id) && seat.state !== "occupied") {
+        seat.state = "occupied";
+      }
+    });
+  });
+}
+
+// ── Update Info Bar ───────────────────────────────────
+function updateInfoBar() {
+  document.getElementById("info-theatre").textContent = currentTheatre.fullName;
+  document.getElementById("info-meta").textContent =
+    `${currentDate} · ${currentShow ? currentShow.time : "Unknown time"}${currentShow && currentShow.format ? " · " + currentShow.format : ""}`;
+  document.getElementById("nav-show-meta").textContent =
+    currentTheatre.name + (currentShow ? " · " + currentShow.time : "");
+  document.title = `Select Seats — ${currentTheatre.name} — CineBook`;
+}
+
+// ── Showtime Switcher (mainly for Cinepolis) ──────────
+function renderShowtimeSwitcher() {
+  const switcher = document.getElementById("showtime-switcher");
+  const shows = CineData.getShowsByTheatreAndDate(currentTheatreId, currentDate)
+    .filter(s => s.time !== null);
+
+  if (shows.length <= 1) { switcher.style.display = "none"; return; }
+
+  switcher.innerHTML = shows.map(s => `
+    <button class="show-switcher-btn ${s.id === currentShowId ? "active" : ""}"
+      data-show-id="${s.id}" aria-pressed="${s.id === currentShowId}">
+      ${s.time}${s.format ? " · " + s.format : ""}
+    </button>
+  `).join("");
+
+  switcher.querySelectorAll(".show-switcher-btn").forEach(btn => {
+    btn.addEventListener("click", () => switchShow(btn.dataset.showId));
+  });
+}
+
+function switchShow(showId) {
+  if (showId === currentShowId) return;
+  currentShowId = showId;
+  App.Session.setShow(showId);
+
+  const showResult = CineData.getShowById(currentTheatreId, showId);
+  currentShow = showResult ? showResult.show : currentShow;
+
+  // Reload layout and clear selections
+  const layoutId = CineData.getSeatLayoutKey(currentTheatreId, currentShowId);
+  seatLayout = CineData.getSeatLayout(layoutId);
+  selectedSeats = [];
+  applyOccupiedSeats();
+
+  updateInfoBar();
+  renderShowtimeSwitcher();
+  renderSeatMap();
+  updateSummary();
+
+  App.showToast(`Switched to ${currentShow.time}${currentShow.format ? " · " + currentShow.format : ""}`, "info");
+}
+
+// ── Render Seat Map ───────────────────────────────────
+function renderSeatMap() {
+  const mapEl = document.getElementById("seat-map");
+  if (!mapEl) return;
+
+  let html = "";
+  let currentCategory = null;
+
+  seatLayout.forEach(rowObj => {
+    // Category separator when category changes
+    if (rowObj.category !== currentCategory) {
+      currentCategory = rowObj.category;
+      const catInfo = CineData.SEAT_CATEGORIES[currentCategory] || { label: currentCategory };
+      html += `
+        <div class="cat-separator">
+          <div class="cat-sep-line"></div>
+          <div class="cat-sep-info">
+            <span class="cat-sep-name">${catInfo.label}</span>
+            <span class="cat-sep-price">₹${rowObj.price}</span>
+          </div>
+          <div class="cat-sep-line"></div>
+        </div>
+      `;
+    }
+
+    html += renderSeatRow(rowObj);
+  });
+
+  mapEl.innerHTML = html;
+
+  // Bind click events
+  mapEl.querySelectorAll(".seat[data-seat-id]").forEach(el => {
+    el.addEventListener("click", () => handleSeatClick(el.dataset.seatId));
+  });
+}
+
+function renderSeatRow(rowObj) {
+  const { row, seats } = rowObj;
+
+  // Group seats by block
+  const leftSeats   = seats.filter(s => s.block === "left");
+  const centerSeats = seats.filter(s => s.block === "center");
+  const rightSeats  = seats.filter(s => s.block === "right");
+
+  function seatHTML(seat) {
+    const isSelected = selectedSeats.some(s => s.id === seat.id);
+    let cls = "seat ";
+    if (isSelected)              cls += "seat-selected";
+    else if (seat.state === "occupied")    cls += "seat-occupied";
+    else if (seat.state === "recommended") cls += "seat-recommended";
+    else                         cls += "seat-available";
+
+    const disabled = seat.state === "occupied" ? "aria-disabled='true'" : "";
+    const label = `${seat.row}${seat.num}`;
+    return `<div class="${cls}" data-seat-id="${seat.id}" role="gridcell"
+      aria-label="Seat ${label} - ${seat.category} - ₹${seat.price}${isSelected?' selected':''}"
+      ${disabled} tabindex="${seat.state === 'occupied' ? '-1' : '0'}"
+      onkeypress="if(event.key==='Enter'||event.key===' ') handleSeatClick('${seat.id}')"
+      title="Seat ${label} (₹${seat.price})">${isSelected ? label : seat.num}</div>`;
+  }
+
+  let rowHTML = `<div class="seat-row" role="row" aria-label="Row ${row}">`;
+  rowHTML += `<div class="row-label">${row}</div>`;
+
+  if (leftSeats.length > 0) {
+    rowHTML += `<div class="seat-block">${leftSeats.map(seatHTML).join("")}</div>`;
+  }
+
+  if (centerSeats.length > 0) {
+    rowHTML += `<div class="seat-aisle"></div>`;
+    rowHTML += `<div class="seat-block">${centerSeats.map(seatHTML).join("")}</div>`;
+  }
+
+  if (rightSeats.length > 0) {
+    rowHTML += `<div class="seat-aisle"></div>`;
+    rowHTML += `<div class="seat-block">${rightSeats.map(seatHTML).join("")}</div>`;
+  }
+
+  rowHTML += `</div>`;
+  return rowHTML;
+}
+
+// ── Seat Click Handler ────────────────────────────────
+function handleSeatClick(seatId) {
+  // Find the seat in layout
+  let foundSeat = null;
+  for (const rowObj of seatLayout) {
+    foundSeat = rowObj.seats.find(s => s.id === seatId);
+    if (foundSeat) break;
+  }
+  if (!foundSeat) return;
+  if (foundSeat.state === "occupied") return;
+
+  const alreadySelected = selectedSeats.findIndex(s => s.id === seatId);
+
+  if (alreadySelected >= 0) {
+    // Deselect
+    selectedSeats.splice(alreadySelected, 1);
+    document.getElementById("max-seats-alert").classList.remove("visible");
+  } else {
+    // Select
+    if (selectedSeats.length >= MAX_SEATS) {
+      document.getElementById("max-seats-alert").classList.add("visible");
+      App.showToast(`Maximum ${MAX_SEATS} seats allowed per booking`, "error");
+      return;
+    }
+    selectedSeats.push(foundSeat);
+    if (selectedSeats.length === MAX_SEATS) {
+      document.getElementById("max-seats-alert").classList.add("visible");
+    }
+  }
+
+  // Re-render only the seat map (efficient partial update)
+  renderSeatMap();
+  updateSummary();
+}
+
+// ── Update Booking Summary ────────────────────────────
+function updateSummary() {
+  const count = selectedSeats.length;
+  const total = selectedSeats.reduce((sum, s) => sum + s.price, 0);
+  const labels = selectedSeats.map(s => s.id).join(", ");
+
+  document.getElementById("seats-count").textContent = `${count} seat${count !== 1 ? "s" : ""}`;
+  document.getElementById("total-price").textContent = total.toLocaleString("en-IN");
+  document.getElementById("selected-seat-labels").textContent = labels || "";
+
+  const btn = document.getElementById("continue-btn");
+  const hasSeats = count > 0;
+  btn.disabled = !hasSeats;
+  btn.style.opacity = hasSeats ? "1" : "0.4";
+  btn.style.cursor  = hasSeats ? "pointer" : "not-allowed";
+  btn.setAttribute("aria-disabled", !hasSeats);
+}
+
+// ── Proceed to Checkout ───────────────────────────────
+function proceedToCheckout() {
+  if (selectedSeats.length === 0) {
+    App.showToast("Please select at least one seat.", "error");
+    return;
+  }
+
+  // Verify seats are still available
+  const seatIds = selectedSeats.map(s => s.id);
+  if (!DSA.areSeatsAvailable(currentTheatreId, currentShowId, seatIds)) {
+    App.showToast("Some seats were just booked by someone else. Please re-select.", "error");
+    selectedSeats = [];
+    applyOccupiedSeats();
+    renderSeatMap();
+    updateSummary();
+    return;
+  }
+
+  // Save to session
+  App.Session.setSeats(selectedSeats);
+  App.Session.setTheatre(currentTheatreId);
+  App.Session.setShow(currentShowId);
+  App.Session.setDate(currentDate);
+
+  const total = selectedSeats.reduce((s, seat) => s + seat.price, 0);
+  window.location.href = `checkout.html?theatre=${currentTheatreId}&show=${currentShowId}&date=${encodeURIComponent(currentDate)}&total=${total}`;
+}
+
+// ── Error state ───────────────────────────────────────
+function showError(msg) {
+  document.getElementById("seat-map").innerHTML = `
+    <div class="empty-state" style="padding:40px 20px;">
+      <div class="empty-state-icon">⚠️</div>
+      <div class="empty-state-title">Cannot Load Seat Map</div>
+      <div class="empty-state-desc">${msg}</div>
+      <button class="btn btn-outline" onclick="history.back()" style="margin-top:16px;">Go Back</button>
+    </div>`;
+}
+</script>
+</body>
+</html>

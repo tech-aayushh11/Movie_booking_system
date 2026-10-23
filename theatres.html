@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Select a theatre and showtime for Udta Teer in Pune. Book tickets at Cinepolis, INOX, PVR and more.">
+  <title>Select Theatre — CineBook</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="page" id="theatres-page">
+
+  <!-- ── Sub-page Bar ───────────────────────────── -->
+  <nav class="subpage-bar">
+    <button class="icon-btn" onclick="App.goBack()" aria-label="Go back">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 12H5M12 5l-7 7 7 7"/>
+      </svg>
+    </button>
+    <div class="subpage-bar-center">
+      <div class="subpage-title" id="nav-movie-title">Udta Teer</div>
+      <div class="subpage-meta" id="nav-movie-meta">UA13+ · Hindi · 2h 18m</div>
+    </div>
+    <div class="topbar-actions">
+      <button class="icon-btn" aria-label="Search theatres" onclick="App.showToast('Theatre search coming soon','info')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+      </button>
+      <button class="icon-btn" aria-label="Hype">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+        </svg>
+      </button>
+      <button class="icon-btn" aria-label="Share" onclick="App.showToast('Share link copied!','success')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+        </svg>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ── Date Tabs ──────────────────────────────── -->
+  <div class="date-scroll" id="date-tabs" role="tablist" aria-label="Select show date">
+    <!-- rendered by JS -->
+    <div class="notify-tab" onclick="App.showToast('Notify me feature coming soon','info')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+      </svg>
+      <span style="font-size:11px;line-height:1.3;">Notify me<br><span style="color:var(--text-muted);">when new shows</span></span>
+    </div>
+  </div>
+
+  <!-- ── Filter Bar ─────────────────────────────── -->
+  <div class="filter-bar" id="filter-bar">
+    <button class="filter-chip active" id="filter-all-btn" onclick="setFilter('all',this)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="14" y2="12"/><line x1="4" y1="18" x2="10" y2="18"/></svg>
+      Filters
+    </button>
+    <button class="filter-chip" id="sortby-btn" onclick="cycleSortBy(this)">
+      Sort by
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <button class="filter-chip" id="after10-btn" onclick="toggleAfter10(this)">After 10 PM</button>
+    <button class="filter-chip" id="recliners-btn" onclick="toggleRecliners(this)">Recliners</button>
+  </div>
+
+  <!-- ── Theatre List ───────────────────────────── -->
+  <div class="theatres-list" id="theatres-list">
+    <!-- rendered by JS -->
+  </div>
+</div>
+
+<script src="data.js"></script>
+<script src="data-structures.js"></script>
+<script src="app.js"></script>
+<script>
+"use strict";
+
+let selectedDate = "23 Oct";
+let filterAfter10 = false;
+let filterRecliners = false;
+let sortByMode = "none"; // "price-asc","price-desc","distance","none"
+let bookmarked = {};
+
+// ── Render Date Tabs ──────────────────────────────────
+function renderDateTabs() {
+  const tabs = document.getElementById("date-tabs");
+  // Keep notify tab
+  const notifyTab = tabs.querySelector(".notify-tab");
+
+  // Clear all date tabs first
+  tabs.querySelectorAll(".date-tab").forEach(t => t.remove());
+
+  CineData.SHOW_DATES.forEach((d, idx) => {
+    const tab = document.createElement("button");
+    tab.className = "date-tab" + (d.short === selectedDate ? " active" : "");
+    tab.setAttribute("role", "tab");
+    tab.setAttribute("aria-selected", d.short === selectedDate ? "true" : "false");
+    tab.id = "date-tab-" + d.id;
+    tab.innerHTML = `
+      <span class="date-tab-label">${d.label || d.short}</span>
+      <span class="date-tab-day">${d.day}</span>
+    `;
+    tab.addEventListener("click", () => selectDate(d.short));
+    tabs.insertBefore(tab, notifyTab);
+  });
+}
+
+function selectDate(dateShort) {
+  selectedDate = dateShort;
+  App.Session.setDate(dateShort);
+  renderDateTabs();
+  renderTheatres();
+}
+
+// ── Filter / Sort controls ────────────────────────────
+function setFilter(type, btn) {
+  // This chip acts as a toggle-all / visual indicator
+  App.showToast("Filters panel coming in next version", "info");
+}
+
+function cycleSortBy(btn) {
+  const modes = ["none", "price-asc", "price-desc", "distance"];
+  const labels = ["Sort by", "Price ↑", "Price ↓", "Distance"];
+  const idx = modes.indexOf(sortByMode);
+  sortByMode = modes[(idx + 1) % modes.length];
+  btn.childNodes[0].textContent = labels[(idx + 1) % modes.length] + " ";
+  btn.classList.toggle("active", sortByMode !== "none");
+  renderTheatres();
+}
+
+function toggleAfter10(btn) {
+  filterAfter10 = !filterAfter10;
+  btn.classList.toggle("active", filterAfter10);
+  renderTheatres();
+}
+
+function toggleRecliners(btn) {
+  filterRecliners = !filterRecliners;
+  btn.classList.toggle("active", filterRecliners);
+  renderTheatres();
+}
+
+// ── Theatre Logo HTML ─────────────────────────────────
+function theatreLogoHTML(type) {
+  switch (type) {
+    case "cinepolis": return `<div class="theatre-logo cinepolis-logo"><span>cinépolis</span></div>`;
+    case "inox":      return `<div class="theatre-logo inox-logo"><span>INOX</span></div>`;
+    case "pvr":       return `<div class="theatre-logo pvr-logo"><span>PVR</span></div>`;
+    default:          return `<div class="theatre-logo" style="background:var(--bg-surface-2);"><span>🎬</span></div>`;
+  }
+}
+
+// ── Render Theatre List ───────────────────────────────
+function renderTheatres() {
+  const container = document.getElementById("theatres-list");
+  if (!container) return;
+
+  let theatres = CineData.THEATRES.slice();
+
+  // Get shows for selected date for each theatre
+  let theatreShowData = theatres.map(t => ({
+    theatre: t,
+    shows: (t.shows[selectedDate] || []).filter(s => s.time !== null)
+  }));
+
+  // Filter: After 10 PM
+  if (filterAfter10) {
+    theatreShowData = theatreShowData.map(ts => ({
+      ...ts,
+      shows: ts.shows.filter(s => {
+        if (!s.time24) return false;
+        const [h] = s.time24.split(":").map(Number);
+        return h >= 22;
+      })
+    }));
+  }
+
+  // Filter: Recliners (INSIGNIA format)
+  if (filterRecliners) {
+    theatreShowData = theatreShowData.map(ts => ({
+      ...ts,
+      shows: ts.shows.filter(s => s.format === "INSIGNIA" || s.format === "Recliner")
+    }));
+  }
+
+  // Sort theatres using Selection Sort (DSA demo) by minimum show price
+  if (sortByMode === "price-asc" || sortByMode === "price-desc") {
+    const withMinPrice = theatreShowData.map(ts => ({
+      ...ts,
+      minPrice: ts.shows.length ? Math.min(...ts.shows.map(s => s.price || 9999)) : 9999
+    }));
+    const sortOrder = sortByMode === "price-asc" ? "asc" : "desc";
+    const sortResult = DSA.selectionSort(withMinPrice, "minPrice", sortOrder);
+    theatreShowData = sortResult.sorted;
+  } else if (sortByMode === "distance") {
+    // Sort by distance (numeric parse)
+    const withDist = theatreShowData.map(ts => ({ ...ts, dist: parseFloat(ts.theatre.distance) || 99 }));
+    const sortResult = DSA.bubbleSort(withDist, "dist", "asc");
+    theatreShowData = sortResult.sorted;
+  }
+
+  // Build HTML
+  let html = "";
+
+  // First section: the featured theatre (Cinepolis, shown at top in screenshot)
+  const cinepolis = theatreShowData.find(ts => ts.theatre.id === "cinepolis-seasons");
+  const nearby    = theatreShowData.filter(ts => ts.theatre.id !== "cinepolis-seasons");
+
+  if (cinepolis) {
+    html += renderTheatreCard(cinepolis);
+  }
+
+  html += `<div class="section-label" style="margin-top:20px;">NEARBY THEATRES</div>`;
+  nearby.forEach(ts => { html += renderTheatreCard(ts); });
+
+  container.innerHTML = html;
+
+  // Bind show buttons
+  container.querySelectorAll(".show-btn[data-show-id]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const theatreId = btn.dataset.theatreId;
+      const showId    = btn.dataset.showId;
+      goToSeats(theatreId, showId);
+    });
+  });
+
+  // Bind bookmark buttons
+  container.querySelectorAll(".bookmark-btn[data-theatre-id]").forEach(btn => {
+    const tid = btn.dataset.theatreId;
+    if (bookmarked[tid]) btn.classList.add("active");
+    btn.addEventListener("click", () => {
+      bookmarked[tid] = !bookmarked[tid];
+      btn.classList.toggle("active", bookmarked[tid]);
+      App.showToast(bookmarked[tid] ? "Theatre bookmarked!" : "Bookmark removed", "info");
+    });
+  });
+}
+
+function renderTheatreCard(ts) {
+  const { theatre: t, shows } = ts;
+  const bm = bookmarked[t.id] ? " active" : "";
+  const prevBooked = t.previouslyBooked
+    ? `<div class="prev-booked-badge">Previously Booked</div>` : "";
+
+  const cancellationHtml = t.cancellation
+    ? `<span class="cancellation-ok">✓ ${t.cancellationText}</span>`
+    : `<span class="cancellation-no">⊘ No Cancellation</span>`;
+
+  // Bookmark icon with optional fill
+  const bmIcon = `
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+    </svg>`;
+
+  let showsHtml = "";
+  if (shows.length === 0) {
+    showsHtml = `<div class="unavailable-note">No shows available for this date${filterAfter10 ? " after 10 PM" : ""}${filterRecliners ? " with Recliners" : ""}.</div>`;
+  } else if (shows[0] && shows[0].availability === "data-unavailable") {
+    showsHtml = `<div class="unavailable-note">⚠ Showtime data unavailable for this theatre. Please check the venue directly.</div>`;
+  } else {
+    showsHtml = `<div class="shows-grid">` + shows.map(s => `
+      <button class="show-btn" data-theatre-id="${t.id}" data-show-id="${s.id}"
+        aria-label="${s.time} - ${s.priceLabel}${s.format ? ' - ' + s.format : ''}">
+        <span class="show-price">${s.priceLabel}</span>
+        <span class="show-time">${s.time}</span>
+        ${s.format ? `<span class="show-format">${s.format}</span>` : ""}
+      </button>
+    `).join("") + `</div>`;
+  }
+
+  return `
+    <div class="theatre-card" id="theatre-${t.id}">
+      <div class="theatre-header">
+        <div class="theatre-logo-wrap">${theatreLogoHTML(t.logoType)}</div>
+        <div class="theatre-info">
+          <div class="theatre-name">${t.fullName} <span style="color:var(--text-muted);font-size:11px;">&rsaquo;</span></div>
+          <div class="theatre-meta-row">
+            <span>${t.distance}</span>
+            <span>·</span>
+            <span class="star-rating">★ ${t.rating}</span>
+            <span style="color:var(--text-muted);font-size:10px;">${t.ratingSource}</span>
+            <span>·</span>
+            ${cancellationHtml}
+          </div>
+        </div>
+        <div class="theatre-actions">
+          <button class="bookmark-btn${bm}" data-theatre-id="${t.id}" aria-label="Bookmark ${t.name}">
+            ${bmIcon}
+          </button>
+        </div>
+      </div>
+      ${prevBooked}
+      ${showsHtml}
+    </div>
+  `;
+}
+
+// ── Navigate to Seat Selection ────────────────────────
+function goToSeats(theatreId, showId) {
+  App.Session.setTheatre(theatreId);
+  App.Session.setDate(selectedDate);
+  App.Session.setShow(showId);
+  App.Session.clearSeats();
+  window.location.href = `seats.html?theatre=${theatreId}&show=${showId}&date=${encodeURIComponent(selectedDate)}`;
+}
+
+// ── Init ──────────────────────────────────────────────
+document.addEventListener("DOMContentLoaded", () => {
+  // Restore session state
+  const sessionDate = App.Session.getDate();
+  if (sessionDate) selectedDate = sessionDate;
+
+  const movieId = App.getParam("movie") || App.Session.getMovie() || "udta-teer";
+  const movie = CineData.getMovieById(movieId);
+  if (movie) {
+    document.getElementById("nav-movie-title").textContent = movie.title;
+    document.getElementById("nav-movie-meta").textContent = `${movie.certification} · ${movie.language} · ${movie.runtime}`;
+    document.title = `${movie.title} — Select Theatre — CineBook`;
+  }
+
+  renderDateTabs();
+  renderTheatres();
+});
+</script>
+</body>
+</html>

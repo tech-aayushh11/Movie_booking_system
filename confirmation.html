@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Booking Confirmed! Your CineBook movie ticket booking is confirmed.">
+  <title>Booking Confirmed — CineBook</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .confirm-page-body {
+      padding: 24px 16px 100px;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+    @keyframes pop-in {
+      0%   { transform: scale(0.7); opacity: 0; }
+      70%  { transform: scale(1.08); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .success-icon-anim {
+      animation: pop-in 0.45s cubic-bezier(0.34,1.56,0.64,1) both;
+    }
+    @keyframes fade-up {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .fade-up { animation: fade-up 0.4s ease both; }
+    .fade-up-1 { animation-delay: 0.15s; }
+    .fade-up-2 { animation-delay: 0.25s; }
+    .fade-up-3 { animation-delay: 0.35s; }
+
+    /* QR grid pattern */
+    .qr-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 2px;
+      padding: 8px;
+      width: 80px;
+      height: 80px;
+    }
+    .qr-cell {
+      border-radius: 1px;
+    }
+  </style>
+</head>
+<body>
+<div class="page" id="confirmation-page">
+
+  <!-- ── Sub-page Bar ───────────────────────────── -->
+  <nav class="subpage-bar">
+    <button class="icon-btn" onclick="window.location.href='index.html'" aria-label="Go home">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+        <polyline points="9 22 9 12 15 12 15 22"/>
+      </svg>
+    </button>
+    <div class="subpage-bar-center">
+      <div class="subpage-title">Booking Confirmation</div>
+    </div>
+    <button class="icon-btn" onclick="window.print()" aria-label="Print ticket">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/>
+      </svg>
+    </button>
+  </nav>
+
+  <!-- ── Not Found State ───────────────────────── -->
+  <div id="not-found-state" class="hidden">
+    <div class="empty-state" style="padding:80px 32px;">
+      <div class="empty-state-icon">⚠️</div>
+      <div class="empty-state-title">No Booking Found</div>
+      <div class="empty-state-desc">No active booking was found. This page only shows successful bookings.</div>
+      <button class="btn btn-primary" onclick="window.location.href='index.html'" style="margin-top:20px;">Go Home</button>
+    </div>
+  </div>
+
+  <!-- ── Confirmation Body ──────────────────────── -->
+  <div id="confirmation-body" class="confirm-page-body hidden">
+
+    <!-- Success icon -->
+    <div style="text-align:center;margin-bottom:16px;">
+      <div class="confirm-success-icon success-icon-anim">✓</div>
+      <h1 style="font-size:20px;font-weight:800;margin-bottom:4px;" class="fade-up fade-up-1">Booking Confirmed!</h1>
+      <p style="font-size:13px;color:var(--text-secondary);" class="fade-up fade-up-1">
+        Your tickets have been reserved successfully.
+      </p>
+    </div>
+
+    <!-- Booking ID -->
+    <div class="booking-id-display fade-up fade-up-2">
+      <div class="booking-id-label">Booking ID</div>
+      <div class="booking-id-value" id="conf-booking-id">—</div>
+    </div>
+
+    <!-- Ticket card -->
+    <div class="ticket-card fade-up fade-up-2" id="ticket-card">
+      <div class="ticket-header">
+        <div class="ticket-header-title" id="ticket-movie">Udta Teer</div>
+        <div class="ticket-header-sub" id="ticket-lang">Hindi · UA13+ · 2h 18m</div>
+      </div>
+
+      <!-- Divider -->
+      <div class="ticket-divider">
+        <div class="ticket-notch"></div>
+        <div class="ticket-dash-line"></div>
+        <div class="ticket-notch"></div>
+      </div>
+
+      <!-- Body -->
+      <div class="ticket-body">
+        <div class="ticket-row">
+          <span class="ticket-key">Theatre</span>
+          <span class="ticket-val" id="ticket-theatre">—</span>
+        </div>
+        <div class="ticket-row">
+          <span class="ticket-key">Date</span>
+          <span class="ticket-val" id="ticket-date">—</span>
+        </div>
+        <div class="ticket-row">
+          <span class="ticket-key">Showtime</span>
+          <span class="ticket-val" id="ticket-show">—</span>
+        </div>
+        <div class="ticket-row">
+          <span class="ticket-key">Format</span>
+          <span class="ticket-val" id="ticket-format">Standard</span>
+        </div>
+        <div class="ticket-row">
+          <span class="ticket-key">Seats</span>
+          <span class="ticket-val" id="ticket-seats">—</span>
+        </div>
+        <div class="ticket-row">
+          <span class="ticket-key">Guest</span>
+          <span class="ticket-val" id="ticket-guest">—</span>
+        </div>
+      </div>
+
+      <!-- Price section -->
+      <div style="background:var(--bg-surface);padding:14px 16px;">
+        <div id="ticket-price-breakdown"></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding-top:10px;border-top:1px solid var(--border-subtle);margin-top:8px;">
+          <span style="font-size:13px;font-weight:600;">Total Paid</span>
+          <span style="font-size:20px;font-weight:800;color:var(--accent);">₹<span id="ticket-total">0</span></span>
+        </div>
+      </div>
+
+      <!-- QR placeholder -->
+      <div style="background:var(--bg-card);padding:16px;display:flex;flex-direction:column;align-items:center;gap:8px;">
+        <div class="qr-placeholder">
+          <div class="qr-grid" id="qr-grid"></div>
+        </div>
+        <div style="font-size:9px;color:var(--text-muted);text-align:center;max-width:180px;line-height:1.5;">
+          ⚠ Demo QR — Not a real scannable ticket. This is a student project demonstration only.
+        </div>
+      </div>
+    </div>
+
+    <!-- Action buttons -->
+    <div class="fade-up fade-up-3" style="display:flex;flex-direction:column;gap:10px;margin-top:8px;">
+      <button class="btn btn-primary btn-full" onclick="window.location.href='bookings.html'">
+        View My Bookings
+      </button>
+      <button class="btn btn-outline btn-full" onclick="window.location.href='index.html'">
+        Back to Home
+      </button>
+    </div>
+  </div>
+</div>
+
+<script src="data.js"></script>
+<script src="data-structures.js"></script>
+<script src="app.js"></script>
+<script>
+"use strict";
+
+document.addEventListener("DOMContentLoaded", () => {
+  // Try to get booking from URL param first, then session
+  const bookingId = App.getParam("id") || "";
+  let booking = null;
+
+  if (bookingId) {
+    booking = DSA.getBookingById(bookingId);
+  }
+  if (!booking) {
+    booking = App.Session.getLastBooking();
+  }
+
+  if (!booking || booking.status === "cancelled") {
+    document.getElementById("not-found-state").classList.remove("hidden");
+    return;
+  }
+
+  // Show the confirmation body
+  document.getElementById("confirmation-body").classList.remove("hidden");
+  document.title = `Booking ${booking.id} Confirmed — CineBook`;
+
+  // Populate fields
+  document.getElementById("conf-booking-id").textContent  = booking.id;
+  document.getElementById("ticket-movie").textContent     = booking.movieTitle;
+  document.getElementById("ticket-theatre").textContent   = booking.theatreName;
+  document.getElementById("ticket-date").textContent      = booking.date;
+  document.getElementById("ticket-show").textContent      = booking.showTime;
+  document.getElementById("ticket-format").textContent    = booking.showFormat || "Standard";
+  document.getElementById("ticket-seats").textContent     = booking.seats.map(s => s.id).join(", ");
+  document.getElementById("ticket-guest").textContent     = booking.guestName;
+  document.getElementById("ticket-total").textContent     = booking.total.toLocaleString("en-IN");
+
+  // Price breakdown
+  const bpEl = document.getElementById("ticket-price-breakdown");
+  const groups = {};
+  booking.seats.forEach(s => {
+    const key = `${s.category}|${s.price}`;
+    if (!groups[key]) groups[key] = { category: s.category, price: s.price, count: 0 };
+    groups[key].count++;
+  });
+  bpEl.innerHTML = Object.values(groups).map(g => {
+    const catInfo = CineData.SEAT_CATEGORIES[g.category] || { label: g.category };
+    return `
+      <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-secondary);padding:4px 0;">
+        <span>${catInfo.label} × ${g.count}</span>
+        <span style="color:var(--text-primary);font-weight:600;">₹${(g.count * g.price).toLocaleString("en-IN")}</span>
+      </div>
+    `;
+  }).join("");
+
+  // Generate a demo QR pattern
+  generateDemoQR(booking.id);
+});
+
+function generateDemoQR(seed) {
+  const grid = document.getElementById("qr-grid");
+  if (!grid) return;
+  // Generate a deterministic pseudo-random pattern from the booking ID
+  let hash = 0;
+  for (let i = 0; i < seed.length; i++) {
+    hash = ((hash << 5) - hash + seed.charCodeAt(i)) | 0;
+  }
+  let html = "";
+  for (let i = 0; i < 49; i++) {
+    const bit = ((hash >> (i % 32)) ^ (i * 0x9e3779b9)) & 1;
+    html += `<div class="qr-cell" style="background:${bit ? '#fff' : 'transparent'};"></div>`;
+  }
+  // Fixed corner markers (QR code corner squares)
+  grid.innerHTML = html;
+}
+</script>
+</body>
+</html>

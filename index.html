@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="CineBook — Book movie tickets for Udta Teer and more. Fast, easy, and reliable cinema booking for Pune theatres.">
+  <title>CineBook — Movie Tickets</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="page" id="home-page">
+
+  <!-- ── Navigation Bar ─────────────────────────── -->
+  <nav class="topbar">
+    <div class="topbar-brand">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <rect width="28" height="28" rx="7" fill="#7650FF"/>
+        <rect x="4" y="8" width="20" height="14" rx="2" fill="none" stroke="#fff" stroke-width="1.5"/>
+        <path d="M4 12h2M22 12h2M4 16h2M22 16h2" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/>
+        <circle cx="14" cy="15" r="3" fill="#fff"/>
+      </svg>
+      CineBook
+      <span style="font-size:11px;font-weight:400;color:var(--text-muted);margin-left:2px;">Pune ▾</span>
+    </div>
+    <div class="topbar-actions">
+      <button class="icon-btn" id="search-btn" aria-label="Search movies">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+      </button>
+      <button class="icon-btn" onclick="window.location.href='bookings.html'" aria-label="My bookings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 12V22H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>
+        </svg>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ── Search Overlay (hidden by default) ────── -->
+  <div id="search-overlay" class="hidden" style="position:fixed;inset:0;z-index:200;background:rgba(17,17,19,0.97);padding:16px;">
+    <div style="display:flex;gap:10px;align-items:center;margin-bottom:16px;">
+      <input id="search-input" type="search" placeholder="Search movies…" class="form-input" style="flex:1;" autocomplete="off">
+      <button onclick="closeSearch()" style="font-size:13px;color:var(--accent);font-weight:600;background:none;border:none;cursor:pointer;">Cancel</button>
+    </div>
+    <div id="search-results"></div>
+  </div>
+
+  <!-- ── Featured Hero ─────────────────────────── -->
+  <section class="home-hero" id="hero-section" role="banner">
+    <img src="backdrop.jpg" alt="Udta Teer cinematic backdrop" class="hero-backdrop" onerror="this.style.display='none'">
+    <div class="hero-gradient"></div>
+    <div class="hero-content">
+      <div class="hero-badge">🎬 Now Showing</div>
+      <h1 class="hero-title">Udta Teer</h1>
+      <p class="hero-meta">UA13+ · Hindi · 2h 18m · 23rd October</p>
+      <button class="btn btn-primary" id="hero-book-btn" onclick="goToMovieDetails('udta-teer')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        View Details
+      </button>
+    </div>
+  </section>
+
+  <!-- ── Currently Showing ─────────────────────── -->
+  <main>
+    <section class="home-section" id="now-showing-section">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+        <h2 class="section-title" style="margin:0;">Now Showing</h2>
+        <div style="display:flex;gap:6px;">
+          <button class="filter-chip active" id="filter-hindi" onclick="filterMovies('Hindi',this)">Hindi</button>
+          <button class="filter-chip" id="filter-all" onclick="filterMovies('All',this)">All</button>
+        </div>
+      </div>
+      <div class="movie-grid" id="movie-grid"></div>
+    </section>
+
+    <!-- ── Sample / Demo note ──────────────────── -->
+    <section class="home-section">
+      <div style="background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--radius-md);padding:12px 14px;display:flex;gap:10px;align-items:flex-start;">
+        <span style="font-size:16px;flex-shrink:0;">ℹ️</span>
+        <p style="font-size:11px;color:var(--text-secondary);line-height:1.6;margin:0;">
+          <strong style="color:var(--text-primary);">Demo Application</strong> — CineBook is a student mini-project for FDS at JSPM's Rajarshi Shahu College of Engineering, Pune. Showtime data is a snapshot from 23 Oct (Fri) and is not live availability.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <!-- ── Footer ─────────────────────────────────── -->
+  <footer class="footer">
+    <a href="bookings.html" class="footer-link">🎟️ My Bookings</a>
+    <span style="color:var(--border);">·</span>
+    <a href="dsa.html" class="footer-link">🧠 DSA Lab</a>
+    <span style="color:var(--border);">·</span>
+    <a href="movie.html" class="footer-link">🎬 Udta Teer</a>
+  </footer>
+</div>
+
+<!-- Scripts -->
+<script src="data.js"></script>
+<script src="data-structures.js"></script>
+<script src="app.js"></script>
+<script>
+"use strict";
+
+// ── Home page specific logic ──────────────────────────
+let currentFilter = "Hindi";
+
+function goToMovieDetails(movieId) {
+  App.Session.setMovie(movieId);
+  window.location.href = "movie.html?id=" + movieId;
+}
+
+function renderMovieGrid(filter) {
+  const grid = document.getElementById("movie-grid");
+  if (!grid) return;
+
+  // Use DSA linearSearch and bubbleSort to filter and sort
+  let movies = CineData.MOVIES.slice();
+
+  // Bubble sort by rating descending (demonstrating the DSA)
+  const sorted = DSA.bubbleSort(movies, "rating", "desc").sorted;
+
+  // Filter
+  const filtered = filter === "All"
+    ? sorted
+    : sorted.filter(m => m.language === filter || m.id === "udta-teer");
+
+  grid.innerHTML = filtered.map(movie => `
+    <article class="movie-card" onclick="goToMovieDetails('${movie.id}')" role="button" tabindex="0"
+      aria-label="View ${movie.title} details" id="movie-card-${movie.id}"
+      onkeypress="if(event.key==='Enter') goToMovieDetails('${movie.id}')">
+      <div class="movie-poster">
+        ${movie.id === "udta-teer"
+          ? `<img src="poster.jpg" alt="${movie.title} poster" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\\'movie-poster-placeholder\\'><span style=\\'font-size:32px;\\'>🎬</span><br>${movie.title}</div>'">`
+          : `<div class="movie-poster-placeholder" style="background:linear-gradient(135deg,${movie.posterBg||'#1C1C20'},#2d2d35);">
+               <span style="font-size:32px;display:block;margin-bottom:6px;">🎬</span>
+               <span>${movie.title}</span>
+             </div>`
+        }
+        ${movie.releaseDate === "Re-release" ? '<div class="movie-card-badge">Re-release</div>' : ""}
+        <button class="movie-hype-btn" onclick="event.stopPropagation();showToast('🔥 Added to hype!','success')" aria-label="Hype ${movie.title}">🔥</button>
+      </div>
+      <div class="movie-card-info">
+        <div class="movie-card-title">${movie.title}</div>
+        <div class="movie-card-meta">${movie.certification} · ${movie.language}</div>
+        <div class="movie-card-hype">${movie.hypeCount || "New"} ${movie.hypeCount ? "are hyped!" : "release"}</div>
+      </div>
+    </article>
+  `).join("");
+}
+
+function filterMovies(filter, btn) {
+  currentFilter = filter;
+  document.querySelectorAll(".filter-chip").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+  renderMovieGrid(filter);
+}
+
+// ── Search ─────────────────────────────────────────────
+const searchBtn = document.getElementById("search-btn");
+const searchOverlay = document.getElementById("search-overlay");
+const searchInput = document.getElementById("search-input");
+const searchResults = document.getElementById("search-results");
+
+searchBtn.addEventListener("click", () => {
+  searchOverlay.classList.remove("hidden");
+  setTimeout(() => searchInput.focus(), 100);
+});
+
+function closeSearch() {
+  searchOverlay.classList.add("hidden");
+  searchInput.value = "";
+  searchResults.innerHTML = "";
+}
+
+searchInput.addEventListener("input", () => {
+  const q = searchInput.value.trim();
+  if (!q) { searchResults.innerHTML = ""; return; }
+
+  // Linear Search (DSA demo)
+  const result = DSA.linearSearch(CineData.MOVIES, q, "title");
+  const matches = CineData.MOVIES.filter(m => m.title.toLowerCase().includes(q.toLowerCase()));
+
+  if (matches.length === 0) {
+    searchResults.innerHTML = `<p style="color:var(--text-muted);font-size:13px;text-align:center;padding:32px 0;">No movies found for "<strong style='color:var(--text-secondary);'>${q}</strong>"</p>`;
+    return;
+  }
+
+  searchResults.innerHTML = `
+    <p style="font-size:11px;color:var(--text-muted);margin-bottom:10px;">
+      🔍 Linear Search — scanned ${DSA.linearSearch(CineData.MOVIES,q,"title").steps} item(s)
+    </p>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      ${matches.map(m => `
+        <div onclick="goToMovieDetails('${m.id}');closeSearch()" style="display:flex;gap:12px;align-items:center;background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--radius-md);padding:12px;cursor:pointer;">
+          <div style="width:36px;height:52px;border-radius:6px;background:var(--bg-surface);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:18px;">🎬</div>
+          <div>
+            <div style="font-size:14px;font-weight:600;">${m.title}</div>
+            <div style="font-size:12px;color:var(--text-secondary);">${m.certification} · ${m.language} · ${m.runtime||''}</div>
+          </div>
+        </div>
+      `).join("")}
+    </div>
+  `;
+});
+
+// Close search on Escape
+document.addEventListener("keydown", e => { if (e.key === "Escape") closeSearch(); });
+
+// Init
+document.addEventListener("DOMContentLoaded", () => {
+  renderMovieGrid(currentFilter);
+});
+
+function showToast(msg, type) { App.showToast(msg, type); }
+</script>
+</body>
+</html>
